@@ -1,0 +1,34 @@
+.container_filtros_socios {
+
+    margin-left: 130px;
+    margin-top: -62px;
+
+}
+
+tr, td{
+    text-align: center;
+}
+
+:host ::ng-deep {
+
+    .p-dialog{
+ 
+        margin-bottom: 250px;
+        margin-left: 290px;
+    
+       
+    }
+    .p-dialog-draggable .p-dialog-header {
+
+  margin-left: 40px;
+ }
+} 
+
+#modificar {
+    margin-right: 50px;
+ }
+
+ #cancelar {
+    margin-left: -40px;
+    margin-right: 80px;
+ }

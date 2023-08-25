@@ -1,0 +1,100 @@
+<br><h2> &nbsp; &nbsp; Registro de cuota</h2>
+<div class="container-formulario">
+<div>
+<form action="" [formGroup]="formularioCuota">
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar-plus"></i>
+        </span>
+        <p-calendar view="year" dateFormat="yy" placeholder="Año" formControlName="anio"></p-calendar>
+    </div>
+    <br>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar-plus"></i>
+        </span>
+        <p-calendar view="month" dateFormat="mm" [readonlyInput]="true" placeholder="Mes" formControlName="mes"></p-calendar>
+    </div>
+<br>
+
+    <p-button styleClass="crear" label="Crear" (click)="crearCuota()" styleClass="p-button-raised"></p-button>
+    <p-button styleClass="datos" label="Datos" (click)="mostrarTabla()" styleClass="p-button-raised"></p-button>
+</form>
+</div>
+<br>
+<div class="container_filtros_cuotas">
+
+    <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+  
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         
+         <input type="text" class="form-select form-control-lg" name="filterAnio" (keyup)="onSearchCuotaAnio(filterPropertyAnio)" [(ngModel)]="filterPropertyAnio" placeholder="Buscar año..." />
+         </div>
+         <br>
+         <div class="p-inputgroup p-m-2">
+             <span class="p-inputgroup-addon">
+                 <i class="pi pi-search"></i>
+             </span>
+             <input type="text" class="form-select form-control-lg" name="filterMes" (keyup)="onSearchCuotaMes(filterPropertyMes)" [(ngModel)]="filterPropertyMes" placeholder="Buscar mes..." />
+     </div>
+     <br>
+     <div *ngIf="generarPdf == true">
+        &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+        </div>
+     </div>
+ </div>
+
+<br>
+<div id="listadoCuotas" style="display:none;">
+    <table class="table-listado">
+        <thead>
+            <tr>
+
+                <th>Año</th>
+                <th>Mes</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let cuota of cuotas | filtroCuota:searchAnio:searchMes">
+                <td>{{cuota.anio}}</td>
+                <td>{{cuota.mes}}</td>
+
+                <td><p-button icon="pi pi-pencil" styleClass="p-button-rounded"
+                        (click)="activador(cuota)"></p-button></td>
+                <td><p-button icon="pi pi-times" styleClass="p-button-rounded"
+                        (click)="eliminarCuota(cuota)"></p-button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<p-dialog header="Modificar Cuota" [(visible)]="display" [closable]="false">
+
+    <form action="" [formGroup]="formularioModificarCuota">
+
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-calendar-plus"></i>
+            </span>
+            <input pInputText placeholder="Año" formControlName="anio" />
+        </div>
+        <br>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-calendar-plus"></i>
+            </span>
+            <input pInputText placeholder="Mes" formControlName="mes" />
+        </div>
+<br>
+        <p-button label="Modificar" id="modificar" (click)="modificarCuota()" styleClass="p-button-raised"></p-button>
+        <p-button label="Cancelar" id="cancelar" (click)="cerrar()" styleClass="p-button-raised"></p-button>
+
+    </form>
+
+</p-dialog>

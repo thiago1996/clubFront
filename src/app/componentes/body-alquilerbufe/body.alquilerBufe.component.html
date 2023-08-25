@@ -1,0 +1,140 @@
+<h2> &nbsp; &nbsp; Alquiler de Bufé</h2>
+<div class="container-formulario">
+    <div>
+<form action="" [formGroup]="formularioAlquilerBufe">
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+        <select formControlName="numeroBufe" [(ngModel)]="numeroBufe">
+            <option value="default" disabled selected="numeroBufe">Seleccione un bufé..</option>
+            <option [value]="bufe.numero" *ngFor="let bufe of bufes"> {{bufe.numero}}</option>
+        </select>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-dollar"></i>
+        </span>
+        <input pInputText placeholder="Importe" formControlName ="importe" />
+    </div>
+    
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+        <select formControlName="medioPago" [(ngModel)]="medioPago">
+            <option value="default" disabled selected="medioPago">Seleccione un medio de pago</option>
+            <option value="Efectivo"> Efectivo</option>
+            <option value="Debito"> Debito</option>
+        </select>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-calendar-plus"></i>
+            </span>
+            <p-calendar [showIcon]="true" placeholder="Fecha" formControlName ="fecha"></p-calendar>
+        </div>
+
+    <p-button styleClass="crear" label="Crear" (click)="crearAlquilerBufe()" styleClass="p-button-raised"></p-button>
+    <p-button  styleClass="datos" label="Datos" (click)="mostrarTabla()" styleClass="p-button-raised"></p-button>
+</form>
+</div>
+
+<div class="container_filtros_alquilerBufe">
+
+    <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+  
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         
+         <input type="text" class="form-select form-control-lg" name="filterFecha" (keyup)="onSearchAlquilerBufeFecha(filterPropertyFecha)" [(ngModel)]="filterPropertyFecha" placeholder="Buscar fecha..." 
+         />
+         </div>
+ <div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterNumeroBufe" (keyup)="onSearchAlquilerBufeNumeroBufe(filterPropertyNumeroBufe)" [(ngModel)]="filterPropertyNumeroBufe" placeholder="Buscar número de bufé..." />
+</div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterMedioPago" (keyup)="onSearchAlquilerBufeMedioPago(filterPropertyMedioPago)" [(ngModel)]="filterPropertyMedioPago" placeholder="Buscar medio de pago..." />
+</div>
+     </div>
+</div>
+ 
+<br>
+<div id="listadoAlquileresBufe" style="display:none;">
+    
+<table class="table-listado">
+    <thead>
+        <tr>
+            <th>Bufe</th>
+            <th>Fecha</th>
+            <th>Importe</th>
+            <th>Pago</th>
+            <th>Editar</th>
+            <th>Eliminar</th>
+        </tr>
+    </thead> 
+    <tbody>
+
+        <tr *ngFor="let alquilerBufe of alquileresBufe | filtroAlquilerBufe:searchFecha:searchNumeroBufe:searchMedioPago">
+            <td>{{ alquilerBufe.bufe.numero }}</td>
+            <td>{{ alquilerBufe.fecha }}</td>
+            <td>{{ alquilerBufe.importe }}</td>
+            <td>{{ alquilerBufe.medioPago  }}</td>
+            
+            <td><p-button styleClass="btn_icono" icon="pi pi-pencil" styleClass="p-button-rounded" (click)="activador(alquilerBufe)"></p-button></td>
+            <td><p-button styleClass="btn_icono" icon="pi pi-times" styleClass="p-button-rounded" (click)="eliminarAlquilerBufe (alquilerBufe )"></p-button></td>
+      </tr> 
+    </tbody>
+</table>
+
+
+<p-dialog header="Modificar alquiler bufe " [(visible)]="display" [closable]="false">
+
+    <form action="" [formGroup]="formularioModificarAlquilerBufe ">
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-list"></i>
+            </span>
+            <select formControlName="numeroBufeModificar" [(ngModel)]="numeroBufeModificar">
+                <option value="" disabled>Seleccione un bufe..</option>
+                <option [value]="bufe.numero" *ngFor="let bufe of bufes"  selected="numeroBufeModificar"> {{bufe.numero}}</option>
+            </select>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-dollar"></i>
+            </span>
+            <input pInputText placeholder="Importe" formControlName ="importe" />
+        </div>
+        
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-list"></i>
+            </span>
+            <select formControlName="medioPagoModificar" [(ngModel)]="medioPagoModificar">
+                <option value="default" disabled selected="medioPagoModificar">Seleccione un medio de pago</option>
+                <option value="Efectivo"> Efectivo</option>
+                <option value="Debito"> Debito</option>
+            </select>
+            </div>
+            <div class="p-inputgroup p-m-2">
+                <span class="p-inputgroup-addon">
+                    <i class="pi pi-calendar-plus"></i>
+                </span>
+                <input type="date" formControlName="fecha" placeholder="Fecha">
+            </div>
+    
+        <p-button styleClass="modificar" id="modificar" label="Modificar" (click)="modificarAlquilerBufe()" styleClass="p-button-raised"></p-button>
+        <p-button label="Cancelar" id="cancelar" (click)="cerrar()" styleClass="p-button-raised"></p-button>
+    </form>
+
+</p-dialog>
+

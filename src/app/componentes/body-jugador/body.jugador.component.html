@@ -1,0 +1,198 @@
+<h2> &nbsp; &nbsp; Registro de jugadores</h2>
+<div class="container-formulario">
+<div>
+<form action="" [formGroup]="formularioJugador">
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-id-card"></i>
+        </span>
+        <input pInputText placeholder="Numero documento" formControlName ="documento" />
+</div>
+    
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-user"></i>
+        </span>
+        <input pInputText placeholder="Nombre" formControlName ="nombre" />
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-user"></i>
+        </span>
+        <input pInputText placeholder="Apellido" formControlName ="apellido"/>
+    </div>
+
+ <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+     <select formControlName="nombreCategoria" [(ngModel)]="nombreCategoria">
+        <option value="default" disabled selected="nombreCategoria">Seleccione una categoria..</option>
+        <option [value]="categoria.nombre" *ngFor="let categoria of categorias"> {{categoria.nombre}}</option>
+     </select>
+        </div>
+
+
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-home"></i>
+        </span>
+        <input pInputText placeholder="Domicilio" formControlName ="domicilio"/>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-phone"></i>
+        </span>
+        <input pInputText placeholder="Teléfono" formControlName ="telefono"/>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar-plus"></i>
+        </span>
+        <p-calendar  [showIcon]="true" placeholder="Fecha de nacimiento" formControlName ="fechaNacimiento"></p-calendar>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar-plus"></i>
+        </span>
+        <p-calendar [showIcon]="true" placeholder="Fecha de asociacion" formControlName ="fechaAlta"></p-calendar>
+    </div>
+
+    <p-button styleClass="crear" label="Crear" (click)="crearJugador()" styleClass="p-button-raised"></p-button>
+    <p-button styleClass="datos" label="Datos" (click)="mostrarTabla()" styleClass="p-button-raised"></p-button>
+</form>
+</div>
+
+<div class="container_filtros_jugadores">
+
+   <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+ 
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-search"></i>
+        </span>
+        
+        <input type="text" class="form-select form-control-lg" name="filterName" (keyup)="onSearchJugadorName(filterPropertyName)" [(ngModel)]="filterPropertyName" placeholder="Buscar nombre..." />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-search"></i>
+            </span>
+            <input type="text" class="form-select form-control-lg" name="filterApellido" (keyup)="onSearchJugadorApellido(filterPropertyApellido)" [(ngModel)]="filterPropertyApellido" placeholder="Buscar apellido..." />
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-search"></i>
+        </span>
+        <input type="text" class="form-select form-control-lg" name="filterDocumento" (keyup)="onSearchJugadorDocumento(filterPropertyDocumento)" [(ngModel)]="filterPropertyDocumento" placeholder="Buscar DNI..." />
+</div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterCategoria" (keyup)="onSearchJugadorCategoria(filterPropertyCategoria)" [(ngModel)]="filterPropertyCategoria" placeholder="Buscar categoria..." />
+</div>
+<br>
+<div *ngIf="generarPdf == true">
+    &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+    </div>
+    </div>
+</div>
+
+<br>
+<div id="listadoJugadores" style="display:none;">
+    <table class="table-listado">
+        <thead>
+        <tr>
+            <th>Documento</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Categoria</th>
+            <th>Deporte</th>
+            <th>Domicilio</th>
+            <th>Telefono</th>
+            <th>Fecha Nacimiento</th>
+            <th>Fecha incorporación</th>
+            <th>Editar</th>
+            <th>Eliminar</th>
+        </tr>
+    </thead> 
+    <tbody>
+
+        <tr *ngFor="let jugador of jugadores | filtroPersona:searchName:searchApellido:searchDocumento:searchCategoria">
+            <td>{{ jugador.documento }}</td>
+            <td>{{ jugador.nombre }}</td>
+            <td>{{ jugador.apellido }}</td>
+            <td>{{ jugador.categoria.nombre }}</td>
+            <td>{{ jugador.categoria.deporte }}</td>
+            <td>{{ jugador.domicilio }}</td>
+            <td>{{ jugador.telefono }}</td>
+            <td>{{ jugador.fechaNacimiento }}</td>
+            <td>{{ jugador.fechaAlta }}</td>
+            <td><p-button icon="pi pi-pencil" styleClass="p-button-rounded" (click)="activador(jugador)"></p-button></td>
+            <td><p-button icon="pi pi-times" styleClass="p-button-rounded" (click)="eliminarJugador(jugador.documento)"></p-button></td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+
+<p-dialog header="Modificar Jugador" [(visible)]="display" [closable]="false">
+
+    <form action="" [formGroup]="formularioModificarJugador">
+        
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-user"></i>
+            </span>
+            <input pInputText placeholder="Nombre" formControlName ="nombre" />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-user"></i>
+            </span>
+            <input pInputText placeholder="Apellido" formControlName ="apellido"/>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-list"></i>
+            </span>
+         <select formControlName="nombreCategoriaAModificar" [(ngModel)]="nombreCategoriaAModificar">
+            <option value="" disabled >Seleccione una categoria..</option>
+            <option [value]="categoria.nombre" *ngFor="let categoria of categorias" selected="nombreCategoriaAModificar"> {{categoria.nombre}}</option>
+         </select>
+            </div>
+
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-home"></i>
+            </span>
+            <input pInputText placeholder="Domicilio" formControlName ="domicilio"/>
+        </div>
+        
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-phone"></i>
+            </span>
+            <input pInputText placeholder="Teléfono" formControlName ="telefono"/>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-calendar-plus"></i>
+            </span>
+            <input type="date" placeholder="Fecha de nacimiento" formControlName ="fechaNacimiento"/>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-calendar-plus"></i>
+            </span>
+            <input type="date" placeholder="Fecha de incorporación" formControlName ="fechaAlta"/>
+        </div>
+    
+        <p-button label="Modificar" id="modificar" (click)="modificarJugador()" styleClass="p-button-raised"></p-button>
+        <p-button label="Cancelar" id="cancelar" (click)="cerrar()" styleClass="p-button-raised"></p-button>
+        
+    </form>
+    
+</p-dialog>
+

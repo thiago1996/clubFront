@@ -1,0 +1,208 @@
+<h2> &nbsp; &nbsp; Registro de partido</h2>
+<div class="container-formulario">
+<div>
+<form action="" [formGroup]="formularioPartido">
+
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-user"></i>
+        </span>
+        <input pInputText placeholder="Descripcion" formControlName="descripcion" />
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+        <select formControlName="cancha" [(ngModel)]="cancha">
+            <option value="default" disabled selected="cancha">Seleccione una cancha</option>
+            <option value="Local"> Local </option>
+            <option value="Visitante"> Visitante </option>
+        </select>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+     <select formControlName="nombreCategoria" [(ngModel)]="nombreCategoria">
+        <option value="default" disabled selected="nombreCategoria">Seleccione una categoria..</option>
+        <option [value]="categoria.nombre" *ngFor="let categoria of categorias"> {{categoria.nombre}}</option>
+     </select>
+     </div>
+     <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+        <select formControlName="tipo" [(ngModel)]="tipo">
+            <option value="default" disabled selected="tipo">Seleccione un tipo de categoria</option>
+            <option value="Infantil"> Infantil </option>
+            <option value="Mayor"> Mayor </option>
+        </select>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+        <select formControlName="deporte" [(ngModel)]="deporte">
+            <option value="default" disabled selected="deporte">Seleccione un Deporte....</option>
+            <option value="Futbol"> Futbol </option>
+        </select>
+    </div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-calendar-plus"></i>
+    </span>
+    <p-calendar [showIcon]="true" placeholder="Fecha" formControlName ="fecha"></p-calendar>
+</div>
+      
+
+    <p-button styleClass="crear" label="Crear" (click)="crearPartido()" styleClass="p-button-raised"></p-button>
+    <p-button styleClass="datos" label="Datos" (click)="mostrarTabla()" styleClass="p-button-raised"></p-button>
+</form>
+</div>
+
+<div class="container_filtros_partido">
+
+    <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+  
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         
+         <input type="text" class="form-select form-control-lg" name="filterDescripcion" (keyup)="onSearchPartidoDescripcion(filterPropertyDescripcion)" [(ngModel)]="filterPropertyDescripcion" placeholder="Buscar descripcion..." 
+         />
+         </div>
+         <div class="p-inputgroup p-m-2">
+             <span class="p-inputgroup-addon">
+                 <i class="pi pi-search"></i>
+             </span>
+             <input type="text" class="form-select form-control-lg" name="filterCancha" (keyup)="onSearchPartidoCancha(filterPropertyCancha)" [(ngModel)]="filterPropertyCancha" placeholder="Buscar cancha..." />
+     </div>
+     <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-search"></i>
+        </span>
+        <input type="text" class="form-select form-control-lg" name="filterCategoria" (keyup)="onSearchPartidoCategoria(filterPropertyCategoria)" [(ngModel)]="filterPropertyCategoria" placeholder="Buscar categoria..." />
+</div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterTipoCategoria" (keyup)="onSearchPartidoTipoCategoria(filterPropertyTipoCategoria)" [(ngModel)]="filterPropertyTipoCategoria" placeholder="Buscar tipo de categoria..." />
+</div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterDeporte" (keyup)="onSearchPartidoDeporte(filterPropertyDeporte)" [(ngModel)]="filterPropertyDeporte" placeholder="Buscar deporte..." />
+</div>
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         <input type="text" class="form-select form-control-lg" name="filterFecha" (keyup)="onSearchPartidoFecha(filterPropertyFecha)" [(ngModel)]="filterPropertyFecha" placeholder="Buscar fecha..." />
+ </div>
+ <br>
+ <div *ngIf="generarPdf == true">
+    &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+    </div>
+     </div>
+
+</div>
+<br>
+<div id="listadoPartidos" style="display:none;">
+    <table class="table-listado">
+        <thead>
+            <tr>
+                
+                <th>Descripcion</th>
+                <th>Cancha</th>
+                <th>Categoria</th>
+                <th>Tipo Categoria</th>
+                <th>Deporte</th>
+                <th>fecha</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let partido of partidos | filtroPartido:searchDescripcion:searchCancha:searchCategoria:searchTipoCategoria:searchDeporte:searchFecha">
+                
+                <td>{{ partido.descripcion }}</td>
+                <td>{{ partido.cancha }}</td>
+                <td>  {{ partido.categoria?.nombre }} </td>
+                <td>  {{ partido.categoria?.tipo }} </td>
+                <td>  {{ partido.categoria?.deporte }} </td>
+                <td> {{ partido.fecha }}</td>
+
+                <td><p-button icon="pi pi-pencil" styleClass="p-button-rounded"
+                        (click)="activador(partido)"></p-button></td>
+                <td><p-button icon="pi pi-times" styleClass="p-button-rounded"
+                        (click)="eliminarPartido(partido)"></p-button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<p-dialog header="Modificar partido" [(visible)]="display" [closable]="false">
+
+    <form action="" [formGroup]="formularioModificarPartido">
+
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-user"></i>
+            </span>
+            <input pInputText placeholder="Descripcion" formControlName="descripcion" />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-list"></i>
+            </span>
+            <select formControlName="canchaModificar" [(ngModel)]="canchaModificar">
+                <option value="default" disabled selected="canchaModificar">Seleccione una cancha</option>
+                <option value="Local"> Local </option>
+                <option value="Visitante"> Visitante </option>
+            </select>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-list"></i>
+            </span>
+         <select formControlName="nombreCategoriaModificar" [(ngModel)]="nombreCategoriaModificar">
+            <option value="default" disabled selected="nombreCategoriaModificar">Seleccione una categoria..</option>
+            <option [value]="categoria.nombre" *ngFor="let categoria of categorias"> {{categoria.nombre}}</option>
+         </select>
+            </div>
+            <div class="p-inputgroup p-m-2">
+                <span class="p-inputgroup-addon">
+                    <i class="pi pi-list"></i>
+                </span>
+                <select formControlName="tipoModificar" [(ngModel)]="tipoModificar">
+                    <option value="default" disabled selected="tipoModificar">Seleccione un tipo de categoria</option>
+                    <option value="Infantil"> Infantil </option>
+                    <option value="Mayor"> Mayor </option>
+                </select>
+            </div>
+            <div class="p-inputgroup p-m-2">
+                <span class="p-inputgroup-addon">
+                    <i class="pi pi-list"></i>
+                </span>
+                <select formControlName="deporteModificar" [(ngModel)]="deporteModificar">
+                    <option value="default" disabled selected="deporteModificar">Seleccione un Deporte....</option>
+                    <option value="Futbol"> Futbol </option>
+                </select>
+            </div>
+            <div class="p-inputgroup p-m-2">
+                <span class="p-inputgroup-addon">
+                    <i class="pi pi-calendar-plus"></i>
+                </span>
+                <input type="date" formControlName="fecha" placeholder="Fecha">
+            </div>
+
+        <p-button label="Modificar" id="modificar"  (click)="modificarPartido()" styleClass="p-button-raised"></p-button>
+        <p-button label="Cancelar" id="cancelar" (click)="cerrar()" styleClass="p-button-raised"></p-button>
+
+    </form>
+
+</p-dialog>

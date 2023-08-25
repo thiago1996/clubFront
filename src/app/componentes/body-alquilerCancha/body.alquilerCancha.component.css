@@ -1,0 +1,39 @@
+p{
+    color: blue;
+ }
+
+ #modificar {
+  margin-right: 50px;
+  margin-left: -20px;
+}
+
+#cancelar {
+  margin-left: -40px;
+  margin-right: 80px;
+}
+
+
+:host ::ng-deep {
+
+  .p-dialog{
+
+      margin-bottom: 230px;
+      margin-left: 320px;
+  
+     
+  }
+  .p-dialog-draggable .p-dialog-header {
+
+margin-left: 40px;
+}
+} 
+
+ .container_filtros_alquilerCancha{
+
+   margin-left: 100px;
+   margin-top: -70px;
+ }
+
+ tr, td{
+  text-align: center;
+}

@@ -1,0 +1,206 @@
+<h2> &nbsp; &nbsp; &nbsp; Registro de Socios</h2>
+<div class="container-formulario">
+<div>
+<form action="" [formGroup]="formularioSocio">
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-id-card"></i>
+        </span>
+        <input pInputText placeholder="Numero documento" formControlName ="documento" />
+</div>
+    
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-user"></i>
+        </span>
+        <input pInputText placeholder="Nombre" formControlName ="nombre" />
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-user"></i>
+        </span>
+        <input pInputText placeholder="Apellido" formControlName ="apellido"/>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-home"></i>
+        </span>
+        <input pInputText placeholder="Domicilio" formControlName ="domicilio"/>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-phone"></i>
+        </span>
+        <input pInputText placeholder="Teléfono" formControlName ="telefono"/>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar-plus"></i>
+        </span>
+        <p-calendar  [showIcon]="true" placeholder="Fecha de nacimiento" formControlName ="fechaNacimiento"></p-calendar>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar-plus"></i>
+        </span>
+        <p-calendar [showIcon]="true" placeholder="Fecha de asociacion" formControlName ="fechaAsociacion"></p-calendar>
+    </div>
+    
+    <p-button  styleClass="crear" label="Crear" (click)="crearSocio()" styleClass="p-button-raised"></p-button>
+    <p-button  styleClass="datos" label="Datos" (click)="mostrarTabla()" styleClass="p-button-raised"></p-button>
+
+</form>
+</div>
+<div class="container_filtros_socios">
+
+   <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+ 
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-search"></i>
+        </span>
+        
+        <input type="text" class="form-select form-control-lg" name="filterName" (keyup)="onSearchSocioName(filterPropertyName)" [(ngModel)]="filterPropertyName" placeholder="Buscar nombre..." />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-search"></i>
+            </span>
+            <input type="text" class="form-select form-control-lg" name="filterApellido" (keyup)="onSearchSocioApellido(filterPropertyApellido)" [(ngModel)]="filterPropertyApellido" placeholder="Buscar apellido..." />
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-search"></i>
+        </span>
+        <input type="text" class="form-select form-control-lg" name="filterDocumento" (keyup)="onSearchSocioDocumento(filterPropertyDocumento)" [(ngModel)]="filterPropertyDocumento" placeholder="Buscar DNI..." />
+</div>
+<br>
+<div *ngIf="generarPdf == true">
+&nbsp; &nbsp; &nbsp; &nbsp;<p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+</div>   
+</div>
+</div>
+    <!--[(ngModel)]="fechaNacimiento"   ....  Si necesito usar la fecha en el ts-->
+   
+    <!--<div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar-plus"></i>
+        </span>
+        <input pInputText placeholder="Fecha de asociacion" formControlName ="fechaAsociacion"/>
+    </div>
+!-->
+    
+<br>
+<div id="listadoSocios" style="display:none;">
+    
+<table class="table-listado">
+    <thead>
+        <tr>
+            <th>Documento</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Domicilio</th>
+            <th>Telefono</th>
+            <th>Fecha Nacimiento</th>
+            <th>Fecha asociacion</th>
+            <th>Editar</th>
+            <th>Eliminar</th>
+        </tr>
+    </thead> 
+    <tbody>
+
+        <tr *ngFor="let socio of socios | filtroPersona:searchName:searchApellido:searchDocumento">
+            <td>{{ socio.documento }}</td>
+            <td>{{ socio.nombre }}</td>
+            <td>{{ socio.apellido }}</td>
+            <td>{{ socio.domicilio }}</td>
+            <td>{{ socio.telefono }}</td>
+            <td>{{ socio.fechaNacimiento }}</td>
+            <td>{{ socio.fechaAsociacion }}</td>
+            <td><p-button styleClass="btn_icono" icon="pi pi-pencil" styleClass="p-button-rounded" (click)="activador(socio)"></p-button></td>
+            <td><p-button styleClass="btn_icono" icon="pi pi-times" styleClass="p-button-rounded" (click)="eliminarSocio(socio.documento)"></p-button></td>
+      </tr> 
+    </tbody>
+</table>
+<!--
+<p-table  [value]="socios" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>Documento</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Domicilio</th>
+            <th>Telefono</th>
+            <th>Fecha Nacimiento</th>
+            <th>Fecha asociacion</th>
+            <th>Editar</th>
+            <th>Eliminar</th>
+        </tr>
+    </ng-template> 
+    <ng-template pTemplate="body" let-socio | filter:search >
+
+        <tr>
+            <td>{{ socio.documento }}</td>
+            <td>{{ socio.nombre }}</td>
+            <td>{{ socio.apellido }}</td>
+            <td>{{ socio.domicilio }}</td>
+            <td>{{ socio.telefono }}</td>
+            <td>{{ socio.fechaNacimiento }}</td>
+            <td>{{ socio.fechaAsociacion }}</td>
+            <td><p-button styleClass="btn_icono" icon="pi pi-pencil" styleClass="p-button-rounded" (click)="activador(socio)"></p-button></td>
+            <td><p-button styleClass="btn_icono" icon="pi pi-times" styleClass="p-button-rounded" (click)="eliminarSocio(socio.documento)"></p-button></td>
+      </tr> 
+    </ng-template>
+</p-table>
+-->
+</div>
+
+
+<p-dialog header="Modificar socio" [(visible)]="display" [closable]="false">
+
+    <form action="" [formGroup]="formularioModificarSocio">
+        
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-user"></i>
+            </span>
+            <input pInputText placeholder="Nombre" formControlName ="nombre" />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-user"></i>
+            </span>
+            <input pInputText placeholder="Apellido" formControlName ="apellido"/>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-home"></i>
+            </span>
+            <input pInputText placeholder="Domicilio" formControlName ="domicilio"/>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-phone"></i>
+            </span>
+            <input pInputText placeholder="Teléfono" formControlName ="telefono"/>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-calendar-plus"></i>
+            </span>
+            <input type="date" placeholder="Fecha de nacimiento" formControlName ="fechaNacimiento"/>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-calendar-plus"></i>
+            </span>
+            <input type="date" placeholder="Fecha de incorporación" formControlName ="fechaAsociacion"/>
+        </div>
+    
+        <p-button label="Modificar" id="modificar" (click)="modificarSocio()" styleClass="p-button-raised"></p-button>
+        <p-button label="Cancelar" id="cancelar" (click)="cerrar()" styleClass="p-button-raised"></p-button>
+    </form>
+    
+</p-dialog>
+
+<!--   | filtrarSocio:filterProperty:properties-->

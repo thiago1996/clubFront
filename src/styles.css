@@ -1,0 +1,60 @@
+.p-button.p-button-raised{
+    left: 25px;
+    margin-left: 15px;
+    }
+  
+/*
+    .p-dialog{
+
+        width: 100%;
+        height: 100%;
+    }*/
+
+    .container-formulario
+{
+    display: flex;
+    
+}
+
+.container_filtros{
+
+    margin-left: 120px;
+    margin-top: 90px;
+}
+
+.table-listado{
+    margin-top: 20px;
+    background-color: #339CFF;
+    text-align: left;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-listado th, td {
+    padding: 20px;
+
+}
+
+.table-listado td{
+    color:white;
+}
+
+.table-listado th{
+    color:black;
+}
+
+.table-listado thead {
+    background-color: #33F9FF;
+    color:black;
+    border-bottom: solid 1px black;
+}
+
+.table-listado tr:nth-child(even){
+
+    background-color: #33BBFF;
+}
+
+.table-listado tr:hover td{
+    background-color: blue;
+    color: white;
+}

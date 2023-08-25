@@ -1,0 +1,101 @@
+<h2> &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  Registro de ingresos de partidos</h2>
+
+<div class="container_filtros_ingresosPartido">
+
+    <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+  
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         
+         <input type="text" class="form-select form-control-lg" name="filterDescripcion" (keyup)="onSearchPartidoDescripcion(filterPropertyDescripcion)" [(ngModel)]="filterPropertyDescripcion" placeholder="Buscar descripcion..." 
+         />
+         </div>
+         <div class="p-inputgroup p-m-2">
+             <span class="p-inputgroup-addon">
+                 <i class="pi pi-search"></i>
+             </span>
+             <input type="text" class="form-select form-control-lg" name="filterCancha" (keyup)="onSearchPartidoCancha(filterPropertyCancha)" [(ngModel)]="filterPropertyCancha" placeholder="Buscar cancha..." />
+     </div>
+     <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-search"></i>
+        </span>
+        <input type="text" class="form-select form-control-lg" name="filterCategoria" (keyup)="onSearchPartidoCategoria(filterPropertyCategoria)" [(ngModel)]="filterPropertyCategoria" placeholder="Buscar categoria..." />
+</div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterTipoCategoria" (keyup)="onSearchPartidoTipoCategoria(filterPropertyTipoCategoria)" [(ngModel)]="filterPropertyTipoCategoria" placeholder="Buscar tipo de categoria..." />
+</div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterDeporte" (keyup)="onSearchPartidoDeporte(filterPropertyDeporte)" [(ngModel)]="filterPropertyDeporte" placeholder="Buscar deporte..." />
+</div>
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         <input type="text" class="form-select form-control-lg" name="filterFecha" (keyup)="onSearchPartidoFecha(filterPropertyFecha)" [(ngModel)]="filterPropertyFecha" placeholder="Buscar fecha..." />
+ </div>
+ <div *ngIf="generarPdf == true">
+    &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+    </div>
+     </div>
+
+<div id="listadoIngresoPartidos" style="display:block;">
+    <table class="table-listado">
+        <thead>
+            <tr>
+                
+                <th>Descripcion</th>
+                <th>Cancha</th>
+                <th>Categoria</th>
+                <th>Tipo Categoria</th>
+                <th>Deporte</th>
+                <th>Fecha</th>
+                <th>Entradas</th>
+                <th>Editar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let partido of partidos | filtroPartido:searchDescripcion:searchCancha:searchCategoria:searchTipoCategoria:searchDeporte:searchFecha">
+                
+                <td>{{ partido.descripcion }}</td>
+                <td>{{ partido.cancha }}</td>
+                <td>  {{ partido.categoria?.nombre }} </td>
+                <td>  {{ partido.categoria?.tipo }} </td>
+                <td>  {{ partido.categoria?.deporte }} </td>
+                <td> {{ partido.fecha }}</td>
+                <td>{{ partido.ingresoEntradas }}</td>
+
+                <td><p-button icon="pi pi-pencil" styleClass="p-button-rounded"
+                        (click)="activador(partido)"></p-button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<p-dialog header="Modificar ingreso de entradas" [(visible)]="display" [closable]="false">
+
+    <form action="" [formGroup]="formularioIngresosPartido">
+
+                <div class="p-inputgroup p-m-2">
+                    <h4>Entradas</h4> &nbsp; &nbsp;&nbsp;
+                <span class="p-inputgroup-addon">
+                    <i class="pi pi-dollar"></i>
+                </span>
+                <input pInputText placeholder="Recaudación entradas" formControlName="ingresoEntradas" />
+            </div>
+<br>
+    <p-button label="Registrar" id="registrar" (click)="modificarPartido()" styleClass="p-button-raised"></p-button>
+    <p-button label="Cancelar" id="cancelar" (click)="cerrar()" styleClass="p-button-raised"></p-button>
+
+    </form>
+
+</p-dialog>

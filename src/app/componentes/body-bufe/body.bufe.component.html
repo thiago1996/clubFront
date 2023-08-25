@@ -1,0 +1,64 @@
+<br><h2> &nbsp; &nbsp; Registro de Bufé</h2>
+<br>
+<div class="container-formulario">
+<div>
+<form action="" [formGroup]="formularioBufe">
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-user"></i>
+        </span>
+        <input pInputText placeholder="Numero" formControlName="numero" />
+    </div>
+<br>
+    <p-button styleClass="crear" label="Crear" (click)="crearBufe()" styleClass="p-button-raised"></p-button>
+    <p-button styleClass="datos" label="Datos" (click)="mostrarTabla()" styleClass="p-button-raised"></p-button>
+</form>
+</div>
+
+ </div>
+
+<br>
+<br>
+<div id="listadoBufes" style="display:none;">
+    <table class="table-listado">
+        <thead>
+            <tr>
+
+                <th>Numero</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let bufe of bufes">
+                <td>{{bufe.numero}}</td>
+
+                <td><p-button icon="pi pi-pencil" styleClass="p-button-rounded"
+                        (click)="activador(bufe)"></p-button></td>
+                <td><p-button icon="pi pi-times" styleClass="p-button-rounded"
+                        (click)="eliminarBufe(bufe)"></p-button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<p-dialog header="Modificar Bufé" [(visible)]="display" [closable]="false">
+
+    <form action="" [formGroup]="formularioModificarBufe">
+
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-user"></i>
+            </span>
+            <input pInputText placeholder="Numero" formControlName="numero" />
+        </div>
+    <br>
+
+            <p-button label="Modificar" id="modificar" (click)="modificarBufe()" styleClass="p-button-raised"></p-button>
+            <p-button label="Cancelar" id="cancelar" (click)="cerrar()" styleClass="p-button-raised"></p-button>
+          
+
+    </form>
+
+</p-dialog>

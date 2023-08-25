@@ -1,0 +1,28 @@
+#modificar {
+    margin-left: -20px;
+    margin-right: 60px;
+ }
+
+ tr, td{
+    text-align: center;
+}
+
+:host ::ng-deep {
+
+    .p-dialog{
+ 
+        margin-top: 300px;
+        margin-right: 70px;
+    
+       
+    }
+    .p-dialog-draggable .p-dialog-header {
+
+  margin-left: 30px;
+ }
+} 
+
+#cancelar {
+    margin-left: -40px;
+    margin-right: 80px;
+ }

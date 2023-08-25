@@ -1,0 +1,186 @@
+<h2> &nbsp; &nbsp; Pago cuota de Socio</h2>
+<div class="container-formulario">
+    <div>
+<form action="" [formGroup]="formularioSocioCuota">
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+        <select formControlName="datosSocio" [(ngModel)]="datosSocio">
+            <option value="default" disabled selected="datosSocio">Seleccione un socio..</option>
+            <option [value]="" *ngFor="let socio of socios"> {{socio.documento}} -  {{socio.nombre}} {{socio.apellido}}</option>
+        </select>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar-plus"></i>
+        </span>
+        <input pInputText placeholder="Año" formControlName ="anio" />
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+        <select formControlName="mes" [(ngModel)]="mes">
+            <option value="0" disabled selected="mes">Seleccione numero de cuota</option>
+            <option [value]="1"> 1 </option>
+            <option [value]="2"> 2 </option>
+            <option [value]="3"> 3 </option>
+            <option [value]="4"> 4 </option>
+            <option [value]="5"> 5 </option>
+            <option [value]="6"> 6 </option>
+            <option [value]="7"> 7 </option>
+            <option [value]="8"> 8 </option>
+            <option [value]="9"> 9 </option>
+            <option [value]="10"> 10 </option>
+            <option [value]="11"> 11 </option>
+            <option [value]="12"> 12 </option>
+        </select>
+        </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-dollar"></i>
+        </span>
+        <input pInputText placeholder="Precio" formControlName ="precio" />
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+        <select formControlName="medioPago" [(ngModel)]="medioPago">
+            <option value="default" disabled selected="medioPago">Seleccione un medio de pago</option>
+            <option value="Efectivo"> Efectivo</option>
+            <option value="Debito"> Debito</option>
+        </select>
+        </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar-plus"></i>
+        </span>
+        <p-calendar [showIcon]="true" placeholder="Fecha de pago" formControlName ="fechaPago"></p-calendar>
+    </div>
+
+    <p-button styleClass="crear" label="Crear" (click)="crearSocioCuota()" styleClass="p-button-raised"></p-button>
+    <p-button  styleClass="datos" label="Datos" (click)="mostrarTabla()" styleClass="p-button-raised"></p-button>
+</form>
+</div>
+
+<div class="container_filtros_pagoCuotaSocio">
+
+    <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+  
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         
+         <input type="text" class="form-select form-control-lg" name="filterName" (keyup)="onSearchSocioName(filterPropertyName)" [(ngModel)]="filterPropertyName" placeholder="Buscar nombre..." />
+         </div>
+         <div class="p-inputgroup p-m-2">
+             <span class="p-inputgroup-addon">
+                 <i class="pi pi-search"></i>
+             </span>
+             <input type="text" class="form-select form-control-lg" name="filterApellido" (keyup)="onSearchSocioApellido(filterPropertyApellido)" [(ngModel)]="filterPropertyApellido" placeholder="Buscar apellido..." />
+     </div>
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         <input type="text" class="form-select form-control-lg" name="filterDocumento" (keyup)="onSearchSocioDocumento(filterPropertyDocumento)" [(ngModel)]="filterPropertyDocumento" placeholder="Buscar DNI..." />
+ </div>
+ <div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterAnio" (keyup)="onSearchSocioAnio(filterPropertyAnio)" [(ngModel)]="filterPropertyAnio" placeholder="Buscar año..." />
+</div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterMes" (keyup)="onSearchSocioMes(filterPropertyMes)" [(ngModel)]="filterPropertyMes" placeholder="Buscar mes..." />
+</div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterMedioPago" (keyup)="onSearchSocioMedioPago(filterPropertyMedioPago)" [(ngModel)]="filterPropertyMedioPago" placeholder="Buscar medio de pago..." />
+</div>
+     </div>
+
+</div>
+ 
+<br>
+<div id="listadoPagosCuotasSocios" style="display:none;">
+    
+<table class="table-listado">
+    <thead>
+        <tr>
+            <th>Documento</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Año</th>
+            <th>Mes</th>
+            <th>Precio</th>
+            <th>Medio</th>
+            <th>Fecha de pago</th>
+            <th>Editar</th>
+            <th>Eliminar</th>
+        </tr>
+    </thead> 
+    <tbody>
+
+        <tr *ngFor="let socioCuota of sociosCuotas | filtroPagoCuota:searchName:searchApellido:searchDocumento:searchAnio:searchMes:searchMedioPago">
+            <td>{{ socioCuota.documento }}</td>
+            <td>{{ socioCuota.nombre }}</td>
+            <td>{{ socioCuota.apellido }}</td>
+            <td>{{ socioCuota.anioCuota }}</td>
+            <td>{{ socioCuota.mesCuota }}</td>
+            <td>{{ socioCuota.precio }}</td>
+            <td>{{ socioCuota.medioPago }}</td>
+            <td>{{ socioCuota.fechaPago }}</td>
+            <td><p-button styleClass="btn_icono" icon="pi pi-pencil" styleClass="p-button-rounded" (click)="activador(socioCuota)"></p-button></td>
+            <td><p-button styleClass="btn_icono" icon="pi pi-times" styleClass="p-button-rounded" (click)="eliminarSocioCuota(socioCuota)"></p-button></td>
+      </tr> 
+    </tbody>
+</table>
+
+
+<p-dialog header="Modificar pago cuota socio" [(visible)]="display" [closable]="false">
+
+    <form action="" [formGroup]="formularioModificarSocioCuota">
+       <div id="datos_cuota_socio">
+        <div class="items"><p>Socio: {{ nombreSocioAModificar }} {{ apellidoSocioAModificar}}</p></div>
+        
+        <div class="items"><p>DNI: {{ documentoSocioAModificar }}</p></div>
+        
+        <div class="items"><p>Cuota: {{ mesCuotaAModificar}}-{{anioCuotaAModificar}}</p></div>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-dollar"></i>
+            </span>
+            <input pInputText placeholder="Precio" formControlName ="precio" />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-list"></i>
+            </span>
+            <select formControlName="medioPagoModificar" [(ngModel)]="medioPagoModificar">
+                <option value="default" disabled selected="medioPagoModificar">Seleccione un medio de pago</option>
+                <option value="Efectivo"> Efectivo</option>
+                <option value="Debito"> Debito</option>
+            </select>
+            </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-calendar-plus"></i>
+            </span>
+            <input type='date' pInputText placeholder="Fecha de pago" formControlName ="fechaPago"/>
+        </div>
+    
+        <p-button styleClass="modificar" id="modificar" label="Modificar" (click)="modificarSocioCuota()" styleClass="p-button-raised"></p-button>
+        <p-button label="Cancelar" id="cancelar" (click)="cerrar()" styleClass="p-button-raised"></p-button>
+    </form>
+
+</p-dialog>

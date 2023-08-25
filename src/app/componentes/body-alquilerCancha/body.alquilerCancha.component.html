@@ -1,0 +1,181 @@
+<h2> &nbsp; &nbsp; Alquiler de cancha</h2>
+<div class="container-formulario">
+    <div>
+<form action="" [formGroup]="formularioAlquilerCancha">
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+        <select formControlName="numeroCancha" [(ngModel)]="numeroCancha">
+            <option value="default" disabled selected="numeroCancha">Seleccione una cancha..</option>
+            <option [value]="cancha.numero" *ngFor="let cancha of canchas"> {{cancha.numero}}</option>
+        </select>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-dollar"></i>
+        </span>
+        <input pInputText placeholder="Importe" formControlName ="importe" />
+    </div>
+    
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+        <select formControlName="medioPago" [(ngModel)]="medioPago">
+            <option value="default" disabled selected="medioPago">Seleccione un medio de pago</option>
+            <option value="Efectivo"> Efectivo</option>
+            <option value="Debito"> Debito</option>
+        </select>
+        </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar-plus"></i>
+        </span>
+        <p-calendar formControlName ="fechaInicio" [showTime]="true" [showSeconds]="true" placeholder="Hora inicio"></p-calendar>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar-plus"></i>
+        </span>
+        <p-calendar formControlName ="fechaFin" [showTime]="true" [showSeconds]="true" placeholder="Hora fin"></p-calendar>
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-comment"></i>
+        </span>
+        <textarea rows="5" cols="30" pInputTextarea formControlName="observaciones" placeholder="Observaciones"></textarea>
+    </div>
+
+    <p-button styleClass="crear" label="Crear" (click)="crearAlquilerCancha()" styleClass="p-button-raised"></p-button>
+    <p-button  styleClass="datos" label="Datos" (click)="mostrarTabla()" styleClass="p-button-raised"></p-button>
+</form>
+</div>
+
+<div class="container_filtros_alquilerCancha">
+
+    <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+  
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         
+         <input type="text" class="form-select form-control-lg" name="filterFecha" (keyup)="onSearchAlquilerCanchaFecha(filterPropertyFecha)" [(ngModel)]="filterPropertyFecha" placeholder="Buscar fecha..." 
+         />
+         </div>
+         <div class="p-inputgroup p-m-2">
+             <span class="p-inputgroup-addon">
+                 <i class="pi pi-search"></i>
+             </span>
+             <input type="text" class="form-select form-control-lg" name="filterHoraInicio" (keyup)="onSearchAlquilerCanchaHoraInicio(filterPropertyHoraInicio)" [(ngModel)]="filterPropertyHoraInicio" placeholder="Buscar hora de inicio..." />
+     </div>
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         <input type="text" class="form-select form-control-lg" name="filterHoraFin" (keyup)="onSearchAlquilerCanchaHoraFin(filterPropertyHoraFin)" [(ngModel)]="filterPropertyHoraFin" placeholder="Buscar hora de finalización..." />
+ </div>
+ <div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterNumeroCancha" (keyup)="onSearchAlquilerCanchaNumeroCancha(filterPropertyNumeroCancha)" [(ngModel)]="filterPropertyNumeroCancha" placeholder="Buscar número de cancha..." />
+</div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterMedioPago" (keyup)="onSearchAlquilerCanchaMedioPago(filterPropertyMedioPago)" [(ngModel)]="filterPropertyMedioPago" placeholder="Buscar medio de pago..." />
+</div>
+     </div>
+</div>
+ 
+<br>
+<div id="listadoAlquileresCancha" style="display:none;">
+    
+<table class="table-listado">
+    <thead>
+        <tr>
+            <th>Cancha</th>
+            <th>Fecha</th>
+            <th>Hora inicio</th>
+            <th>Hora fin</th>
+            <th>Importe</th>
+            <th>Pago</th>
+            <th>Observaciones</th>
+            <th>Editar</th>
+            <th>Eliminar</th>
+        </tr>
+    </thead> 
+    <tbody>
+
+        <tr *ngFor="let alquilerCancha of alquileresCancha | filtroAlquilerCancha:searchFecha:searchHoraInicio:searchHoraFin:searchNumeroCancha:searchMedioPago">
+            <td>{{ alquilerCancha.numeroCancha }}</td>
+            <td>{{ alquilerCancha.fecha }}</td>
+            <td>{{ alquilerCancha.horaInicio }}</td>
+            <td>{{ alquilerCancha.horaFin }}</td>
+            <td>{{ alquilerCancha.importe }}</td>
+            <td>{{ alquilerCancha.medioPago  }}</td>
+            <td>{{ alquilerCancha.observaciones  }}</td>
+            
+            <td><p-button styleClass="btn_icono" icon="pi pi-pencil" styleClass="p-button-rounded" (click)="activador(alquilerCancha)"></p-button></td>
+            <td><p-button styleClass="btn_icono" icon="pi pi-times" styleClass="p-button-rounded" (click)="eliminarAlquilerCancha (alquilerCancha )"></p-button></td>
+      </tr> 
+    </tbody>
+</table>
+
+
+<p-dialog header="Modificar alquiler cancha " [(visible)]="display" [closable]="false">
+
+    <form action="" [formGroup]="formularioModificarAlquilerCancha ">
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-list"></i>
+            </span>
+            <select formControlName="numeroCanchaModificar" [(ngModel)]="numeroCanchaModificar">
+                <option value="" disabled>Seleccione una cancha..</option>
+                <option [value]="cancha.numero" *ngFor="let cancha of canchas"  selected="numeroCanchaModificar"> {{cancha.numero}}</option>
+            </select>
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-dollar"></i>
+            </span>
+            <input pInputText placeholder="Importe" formControlName ="importe" />
+        </div>
+        
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-list"></i>
+            </span>
+            <select formControlName="medioPagoModificar" [(ngModel)]="medioPagoModificar">
+                <option value="default" disabled selected="medioPagoModificar">Seleccione un medio de pago</option>
+                <option value="Efectivo"> Efectivo</option>
+                <option value="Debito"> Debito</option>
+            </select>
+            </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-calendar-plus"></i>
+            </span>
+            <input type="dateTime" formControlName = "fechaInicio">
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-calendar-plus"></i>
+            </span>
+            <input type="datetime" formControlName = "fechaFin">
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-comments"></i>
+            </span>
+            <textarea rows="5" cols="30" pInputTextarea formControlName="observaciones"></textarea>
+        </div>
+    
+        <p-button styleClass="modificar" id="modificar" label="Modificar" (click)="modificarAlquilerCancha()" styleClass="p-button-raised"></p-button>
+        <p-button label="Cancelar" id="cancelar" (click)="cerrar()" styleClass="p-button-raised"></p-button>
+    </form>
+
+</p-dialog>

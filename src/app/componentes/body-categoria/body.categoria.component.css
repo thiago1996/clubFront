@@ -1,0 +1,34 @@
+.container_filtros_categorias {
+
+    margin-left: 90px;
+    margin-top: -62px;
+
+}
+
+tr, td{
+    text-align: center;
+}
+
+:host ::ng-deep {
+
+    .p-dialog{
+ 
+        margin-bottom: 320px;
+        margin-left: 120px;
+       
+    }
+    .p-dialog-draggable .p-dialog-header {
+
+  margin-left: 50px;
+ }
+} 
+
+#cancelar {
+    margin-left: -40px;
+    margin-right: 80px;
+ }
+
+ #modificar {
+    margin-left: -20px;
+    margin-right: 60px;
+ }
