@@ -5,6 +5,10 @@ import { FormGroup, FormBuilder, Validators, NonNullableFormBuilder, FormControl
 import Swal from 'sweetalert2';
 import { PagoServicio } from 'src/app/modelo/PagoServicio';
 import { CuentaServicio } from 'src/app/servicio/cuenta.servicio';
+import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
+import { Router } from '@angular/router';
+import { TransaccionServicio } from 'src/app/servicio/transaccion.servicio';
+import { Transaccion } from 'src/app/modelo/Transaccion';
 
 @Component({
   selector: 'app-body-pagoServicio',
@@ -33,8 +37,11 @@ export class BodyPagoServicioComponent {
   searchDescripcion:string="";
   searchFecha:string="";
   searchMedioPago:string="";
+  generarPdf:boolean=false;
+  idTransaccion:any
+  idPagoServicioModificar:any;
 
-  constructor(private fb:FormBuilder, private psService: PagoServicioServicio, private cService: CuentaServicio ){
+  constructor(private fb:FormBuilder, private psService: PagoServicioServicio, private cService: CuentaServicio, private rService:ReporteServicio, private tService:TransaccionServicio, private router:Router){
   
     this.formularioPagoServicio = fb.group({
 
@@ -66,25 +73,64 @@ export class BodyPagoServicioComponent {
   crearPagoServicio(){
  if(this.formularioPagoServicio.valid){ 
   
+    let fecha:Date;
+    let numeroMesFecha:number;
+    let mesFecha:String="";
+    let numeroDiaFecha:number;
+    let diaFecha:String="";
+    let fechaString="";
     let pagoServicio:PagoServicio;
     pagoServicio = new PagoServicio();
     pagoServicio.descripcion = this.formularioPagoServicio.get('descripcion')?.value;
     pagoServicio.importe = this.formularioPagoServicio.get('importe')?.value;
     pagoServicio.medioPago= this.formularioPagoServicio.get('medioPago')?.value;
-    pagoServicio.fecha = this.formularioPagoServicio.get('fecha')?.value;
+    //pagoServicio.fecha = this.formularioPagoServicio.get('fecha')?.value;
+    fecha = this.formularioPagoServicio.get('fecha')?.value;
+ 
+
+    numeroMesFecha=fecha.getMonth()+1;
+    mesFecha= numeroMesFecha.toString();
+    numeroDiaFecha=fecha.getDate();
+    diaFecha= numeroDiaFecha.toString();
     
-   
+    if(numeroMesFecha<10)
+    {
+      mesFecha="0"+numeroMesFecha;
+    }
+    else
+    {
+      mesFecha= numeroMesFecha.toString();
+    }
+  
+    if(numeroDiaFecha<10)
+    {
+      diaFecha="0"+numeroDiaFecha;
+     
+    }
+    
+    else{
+      diaFecha= numeroDiaFecha.toString();
+    }
+  
+  
+    fechaString=fecha.getFullYear()+'-'+mesFecha+'-'+diaFecha;
+
+
     let descripcion:any;
     descripcion= pagoServicio.descripcion; 
-    let fecha:any;
-    fecha = pagoServicio.fecha;
+    //let fecha:any;
+    //fecha = pagoServicio.fecha;
+    pagoServicio.fecha = fechaString;
     let importe:any;
     importe = pagoServicio.importe;
     let medioPago:any;
     medioPago = pagoServicio.medioPago;
 
+    let transaccion:Transaccion;
+    transaccion = new Transaccion();
+
  
-     this.buscarIdPagoServicio(descripcion, fecha);
+     this.buscarIdPagoServicio(descripcion, fechaString);
   
   setTimeout(() => {
     
@@ -127,7 +173,26 @@ export class BodyPagoServicioComponent {
   
       });
      }
+
+     this.psService.mostrarPagosServicioPorDescripcionFechaImporteYMedioPago(pagoServicio.descripcion, pagoServicio.fecha, pagoServicio.importe, pagoServicio.medioPago).subscribe( res=> {
+
+      pagoServicio.id = res[0].id;
+    });
       
+    setTimeout(() => {  
+
+     transaccion.tipo="Egreso";
+     transaccion.pagoServicio=pagoServicio;
+     transaccion.fecha=pagoServicio.fecha;
+     transaccion.medioPago= medioPago;
+     transaccion.importe=importe;
+     transaccion.descripcion=pagoServicio.descripcion;
+
+     console.log(transaccion);
+ this.tService.crearTransaccion(transaccion).subscribe(res=>{
+               
+ });
+}, 300);
     });
     
   }
@@ -208,6 +273,7 @@ export class BodyPagoServicioComponent {
         this.mostrarPagosServicio();
         let tabla = document.getElementById('listadoPagosServicio')
         if(tabla)  tabla.style.display = "block"; 
+        this.generarPdf=true;
       }
 
       activador(pagoServicio: PagoServicio ){
@@ -222,6 +288,7 @@ export class BodyPagoServicioComponent {
         this.fechaAModificar = pagoServicio.fecha;
         this.importeAModificar = pagoServicio.importe;
         this.medioPagoAModificar = pagoServicio.medioPago;
+        this.idPagoServicioModificar=pagoServicio.id;
 
         this.display= !this.display;
         
@@ -234,6 +301,8 @@ export class BodyPagoServicioComponent {
             let pagoServicio:PagoServicio;
             let importe:any;
             pagoServicio = new PagoServicio();
+            let transaccion:Transaccion;
+            transaccion = new Transaccion();
           
             pagoServicio.descripcion = this.formularioModificarPagoServicio.get('descripcion')?.value;
             pagoServicio.importe = this.formularioModificarPagoServicio.get('importe')?.value;
@@ -246,6 +315,8 @@ export class BodyPagoServicioComponent {
             descripcion = pagoServicio.descripcion;
             let fecha :any;
             fecha = pagoServicio.fecha;
+
+            this.idTransaccionPorIdPagoServicio(this.idPagoServicioModificar);  
            
            //this.buscarIdPagoServicio(descripcion, fecha);
            this.buscarIdPagoServicioPorParametros(descripcion, fecha, importe, this.medioPagoModificar);
@@ -354,6 +425,22 @@ export class BodyPagoServicioComponent {
                 }
              }
 
+             if(this.idTransaccion!=0){
+
+              transaccion.id = this.idTransaccion;
+             }
+
+             transaccion.tipo="Egreso";
+             transaccion.id=this.idTransaccion;
+             transaccion.pagoServicio=pagoServicio;
+             transaccion.fecha=pagoServicio.fecha;
+             transaccion.medioPago= this.medioPagoModificar;
+             transaccion.importe=importe;
+             transaccion.descripcion=pagoServicio.descripcion;
+         this.tService.crearTransaccion(transaccion).subscribe(res=>{
+                       
+         });
+         
              
             });
           }, 500);
@@ -365,15 +452,26 @@ export class BodyPagoServicioComponent {
           }
 
           eliminarPagoServicio(pagoServicio:PagoServicio){
-
+            
             let descripcion:any = pagoServicio.descripcion;
             let fecha:any = pagoServicio.fecha;
             let importe:any = pagoServicio.importe;
-          
-                this.buscarIdPagoServicio(descripcion, fecha);
+            let id_pagoServicio:any;
+            id_pagoServicio = pagoServicio.id;
+                
+          //      this.buscarIdPagoServicio(descripcion, fecha);
+          this.idTransaccionPorIdPagoServicio(id_pagoServicio);
+
+          setTimeout(() => {
+            
+            this.tService.eliminarTransaccion(this.idTransaccion).subscribe(res=>{
+                       
+            });
+          }, 500);
+
                 setTimeout(() => {
           
-                this.psService.eliminarPagoServicio(this.id_pagoServicio).subscribe(res =>{
+                this.psService.eliminarPagoServicio(id_pagoServicio).subscribe(res =>{
                   Swal.fire({
                     position: 'center',
                     icon: 'success',
@@ -419,6 +517,106 @@ export class BodyPagoServicioComponent {
           cerrar(){
             this.display = !this.display;
           }
-  
+
+          imprimir(){
+
+            const encabezado = ["Descricion", "Importe", "Medio de pago", "Fecha de pago"];
+          
+            let pagoServicioFiltrado: Array<PagoServicio>;
+            pagoServicioFiltrado = new Array<PagoServicio>();
+           
+            pagoServicioFiltrado= this.filtroPagoServicio(this.pagosServicio, this.searchDescripcion, this.searchMedioPago, this.searchFecha);
+          
+           const cuerpo =  pagoServicioFiltrado.map(
+          
+            (obj : PagoServicio) => {
+              const datos = [
+                obj.descripcion,
+                obj.importe,
+                obj.medioPago,
+                obj.fecha
+              ]
+              return datos;
+            }
+           )
+          
+          this.rService.imprimir(encabezado, cuerpo, "Listado de pagos de servicios", true);
+          
+          }
+          
+          filtroPagoServicio(values: PagoServicio[], searchDescripcion: string, searchMedioPago:string, searchFecha:string): any[] {
+      
+            let filterValues=values;
+
+            if(values.length>0){
+            
+              if(searchDescripcion!=""){ 
+              values.forEach(value =>
+                {
+              let descripcion:any=value.descripcion;
+              value.descripcion= descripcion.toLowerCase();
+            
+          }
+              );
+              searchDescripcion=searchDescripcion.toLowerCase();
+              filterValues= filterValues.filter(value => value.descripcion?.includes(searchDescripcion));
+            }
+             
+              if(searchMedioPago!=""){
+                values.forEach(value =>
+                  {
+                let medioPago:any=value.medioPago;
+                value.medioPago= medioPago.toLowerCase();
+            }
+                );
+              searchMedioPago=searchMedioPago.toLowerCase();
+              filterValues=filterValues.filter(value => value.medioPago?.includes(searchMedioPago));
+            
+            }
+          
+            if(searchFecha!=""){
+              values.forEach(value =>
+                {
+              let fecha:any=value.fecha;
+              value.fecha= fecha.toLowerCase();
+          }
+              );
+            searchFecha=searchFecha.toLowerCase();
+            filterValues=filterValues.filter(value => value.fecha?.includes(searchFecha));
+          
+          }
+          
+          }
+          
+          filterValues.forEach(element => {
+            element.descripcion = this.mayusculaPrimerLetra(element.descripcion);
+            element.medioPago = this.mayusculaPrimerLetra(element.medioPago);
+          });
+          
+          return filterValues;
+          
+          }
+          
+          mayusculaPrimerLetra(string:String) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+          }
+          
+          volver(){
+
+            if(this.router.url=="/homeAdministrador/pagoServicio/nuevo"){ 
+              this.router.navigate(['/homeAdministrador']);
+              }
+              else{
+                this.router.navigate(['/homeInvitado']);
+              }
+          }
+
+          idTransaccionPorIdPagoServicio(idPagoServicio:number){
+
+            this.tService.mostrarTransaccionesPorIdPagoServicio(idPagoServicio).subscribe(res=>{
+                        
+             this.idTransaccion=res[0].id;
+            });
+          }
   }
 

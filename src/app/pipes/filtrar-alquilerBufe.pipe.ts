@@ -6,7 +6,7 @@ import { AlquilerBufe } from '../modelo/AlquilerBufe';
 })
 export class FiltrarAlquilerBufePipe implements PipeTransform {
 
-  transform(values: AlquilerBufe[], searchFecha: string, searchNumeroBufe:string, searchMedioPago:string): any[] {
+  transform(values: any[], searchFecha: string, searchNumeroBufe:string, searchMedioPago:string): any[] {
 
     let filterValues=values;
 
@@ -29,9 +29,18 @@ export class FiltrarAlquilerBufePipe implements PipeTransform {
 
    
   if(searchNumeroBufe.toString()!=""){ 
+
    
-    filterValues= filterValues.filter(value => value.bufe?.numero.toString().includes(searchNumeroBufe));
-  }
+   if(filterValues[0].bufe!=null){ 
+    console.log("hola!");
+    filterValues= filterValues.filter(value => value.bufe?.numeroBufe.toString().includes(searchNumeroBufe));
+    }
+    if(filterValues[0].numeroBufe!=null){ 
+      console.log("chau");
+      filterValues=filterValues.filter(value => value.numeroBufe.toString().includes(searchNumeroBufe));
+    }
+   
+  }  
 
   if(searchMedioPago!=""){
     searchMedioPago=searchMedioPago.toLowerCase();

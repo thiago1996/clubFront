@@ -5,6 +5,7 @@ import { Categoria } from 'src/app/modelo/Categoria';
 import { JugadorServicio } from 'src/app/servicio/jugador.servicio';
 import Swal from 'sweetalert2';
 import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-body-jugador',
@@ -33,7 +34,7 @@ export class BodyJugadorComponent {
   generarPdf:boolean=false;
 
 
-constructor(private fb:FormBuilder, private jService: JugadorServicio, private rService:ReporteServicio){
+constructor(private fb:FormBuilder, private jService: JugadorServicio, private rService:ReporteServicio, private router:Router){
 
   this.display=false;
   this.categoria=new Categoria();
@@ -337,5 +338,16 @@ filtroJugadores(values: any[], searchName: string, searchApellido:string, search
     mayusculaPrimerLetra(string:String) {
       return string.charAt(0).toUpperCase() + string.slice(1);
     }
+
+    volver(){
+
+      if(this.router.url=="/homeAdministrador/jugador/nuevo"){ 
+        this.router.navigate(['/homeAdministrador']);
+        }
+        else{
+          this.router.navigate(['/homeInvitado']);
+        }
+    }
+
 
 }

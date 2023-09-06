@@ -1,6 +1,7 @@
 import { NONE_TYPE } from '@angular/compiler';
 import { Component, ɵsetAllowDuplicateNgModuleIdsForTest } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, NonNullableFormBuilder, FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Bufe } from 'src/app/modelo/Bufe';
 import { BufeServicio } from 'src/app/servicio/bufe.servicio';
 import Swal from 'sweetalert2';
@@ -21,14 +22,12 @@ export class BodyBufeComponent {
   display:boolean;
   numeroAModificar:any;
 
-  constructor(private fb:FormBuilder, private bService: BufeServicio){
+  constructor(private fb:FormBuilder, private bService: BufeServicio, private router:Router){
 
     this.bufes= new Array<Bufe>();
     this.bufesPorNumero = new Array<Bufe>();
     this.display=false;
     this.bufe=new Bufe();
-    this.numeroAModificar
-  
   
     this.formularioBufe = fb.group({
   
@@ -48,10 +47,10 @@ export class BodyBufeComponent {
     
       let bufe:Bufe;
       bufe = new Bufe();
-      bufe.numero = this.formularioBufe.get('numero')?.value;
+      bufe.numeroBufe = this.formularioBufe.get('numero')?.value;
       
       let numero:any;
-      numero = bufe.numero;
+      numero = bufe.numeroBufe;
    
        this.buscarIdBufe(numero);
     
@@ -139,7 +138,7 @@ export class BodyBufeComponent {
 eliminarBufe(bufe:Bufe){
 
  
-  let numero:any = bufe.numero;
+  let numero:any = bufe.numeroBufe;
 
       this.buscarIdBufe(numero);
       setTimeout(() => {
@@ -164,9 +163,9 @@ eliminarBufe(bufe:Bufe){
 
 activador(bufe: Bufe){
 
-this.formularioModificarBufe.get('numero')?.setValue(bufe.numero);
+this.formularioModificarBufe.get('numero')?.setValue(bufe.numeroBufe);
 
-this.numeroAModificar = bufe.numero;
+this.numeroAModificar = bufe.numeroBufe;
 this.display= !this.display;
 
 }
@@ -175,10 +174,10 @@ modificarBufe(){
 
 if(this.formularioModificarBufe.valid){
 
-  this.bufe.numero = this.formularioModificarBufe.get('numero')?.value;
+  this.bufe.numeroBufe = this.formularioModificarBufe.get('numero')?.value;
  
   let numero :any;
-  numero = this.bufe.numero;
+  numero = this.bufe.numeroBufe;
  
  this.buscarIdBufe(numero);
 
@@ -228,6 +227,16 @@ this.buscarIdBufe(this.numeroAModificar);
 
 cerrar(){
   this.display = !this.display;
+}
+
+volver(){
+
+  if(this.router.url=="/homeAdministrador/bufe/nuevo"){ 
+    this.router.navigate(['/homeAdministrador']);
+    }
+    else{
+      this.router.navigate(['/homeInvitado']);
+    }
 }
 
 }

@@ -26,6 +26,10 @@ p{
 
 margin-left: 40px;
 }
+
+#btn_volver{
+  margin-left: 90%;
+ }
 } 
 
  .container_filtros_alquilerCancha{

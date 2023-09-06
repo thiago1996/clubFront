@@ -1,6 +1,7 @@
 import { NONE_TYPE } from '@angular/compiler';
 import { Component, ɵsetAllowDuplicateNgModuleIdsForTest } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, NonNullableFormBuilder, FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Categoria } from 'src/app/modelo/Categoria';
 import { CategoriaServicio } from 'src/app/servicio/categoria.servicio';
 import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
@@ -34,7 +35,7 @@ export class BodyCategoriaComponent {
 
   
 
-constructor(private fb:FormBuilder, private cService: CategoriaServicio, private rService:ReporteServicio){
+constructor(private fb:FormBuilder, private cService: CategoriaServicio, private rService:ReporteServicio,private router:Router){
 
   this.categorias= new Array<Categoria>();
   this.display=false;
@@ -412,6 +413,16 @@ filtroCategorias(values: Categoria[], searchName: string, searchType:string, sea
 }
     mayusculaPrimerLetra(string:String) {
       return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    volver(){
+
+      if(this.router.url=="/homeAdministrador/categoria/nuevo"){ 
+        this.router.navigate(['/homeAdministrador']);
+        }
+        else{
+          this.router.navigate(['/homeInvitado']);
+        }
     }
 
 }

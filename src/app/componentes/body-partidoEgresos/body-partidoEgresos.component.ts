@@ -1,8 +1,12 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, NonNullableFormBuilder, FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Partido } from 'src/app/modelo/Partido';
+import { Transaccion } from 'src/app/modelo/Transaccion';
 import { CuentaServicio } from 'src/app/servicio/cuenta.servicio';
 import { PartidoServicio } from 'src/app/servicio/partido.servicio';
+import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
+import { TransaccionServicio } from 'src/app/servicio/transaccion.servicio';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -31,14 +35,19 @@ export class BodyPartidoEgresosComponent {
   egresoSeguridadAModificar:any;
   egresoMedicosAModificar:any;
   egresoExtraAModificar:any;
+  generarPdf:boolean=false;
+  idTransaccion:any
+
+  transaccionPorPartido:Transaccion;
 
   partidos: Array<Partido>;
 
-  constructor(private fb:FormBuilder, private pService: PartidoServicio, private cService: CuentaServicio){
+  constructor(private fb:FormBuilder, private pService: PartidoServicio, private cService: CuentaServicio, private rService:ReporteServicio, private tService:TransaccionServicio, private tServicie:TransaccionServicio, private router:Router){
   
     this.partidos= new Array<Partido>();
     this.display = false;
     this.partido = new Partido();
+    this.transaccionPorPartido= new Transaccion();
     this.mostrarTabla();
 
     this.formularioEgresosPartido = fb.group({
@@ -56,6 +65,10 @@ export class BodyPartidoEgresosComponent {
 
     this.pService.mostrarPartidos().subscribe(res =>{
       this.partidos = res;
+      this.partidos.forEach(element => {
+        element.gastoTotal=element.gastoArbitros+element.gastoMedicos+element.gastoSeguridad+element.gastoExtra;
+      });
+      
     })
   }
 
@@ -70,12 +83,18 @@ export class BodyPartidoEgresosComponent {
     let observaciones:any;
     let valorArestarDeCuenta=0;
     let valorASumarDeCuenta=0;
+    let egresoTotal=0;
+
+    let transaccion:Transaccion;
+    transaccion = new Transaccion();
     
     gastoArbitros = +this.formularioEgresosPartido.get('gastoArbitros')?.value;
     gastoSeguridad = +this.formularioEgresosPartido.get('gastoSeguridad')?.value;
     gastoMedicos = +this.formularioEgresosPartido.get('gastoMedicos')?.value;
     gastoExtra = +this.formularioEgresosPartido.get('gastoExtra')?.value;
     observaciones = this.formularioEgresosPartido.get('observaciones')?.value;
+
+    egresoTotal=gastoArbitros+gastoSeguridad+gastoMedicos+gastoExtra;
 
 if((!isNaN(gastoArbitros))||(!isNaN(gastoSeguridad))||(!isNaN(gastoMedicos))||(!isNaN(gastoExtra))){
 
@@ -91,6 +110,7 @@ if((!isNaN(gastoArbitros))||(!isNaN(gastoSeguridad))||(!isNaN(gastoMedicos))||(!
   }
   else{
 
+    this.idTransaccionPorPartidoYTipo(this.partido, "Egreso");
     this.partido.gastoArbitros = gastoArbitros;
     this.partido.gastoSeguridad = gastoSeguridad;
     this.partido.gastoMedicos = gastoMedicos;
@@ -169,6 +189,22 @@ console.log(valorArestarDeCuenta);
   });
 }, 500);
 
+if(this.idTransaccion!=0){
+
+  transaccion.id = this.idTransaccion;
+ }
+
+    transaccion.tipo="Egreso";
+    transaccion.partido=this.partido;
+    transaccion.fecha=this.partido.fecha;
+    transaccion.medioPago="Efectivo";
+    transaccion.importe=egresoTotal;
+    transaccion.descripcion=this.partido.descripcion +" "+this.partido.categoria.nombre+" "+this.partido.categoria.deporte;
+
+this.tService.crearTransaccion(transaccion).subscribe(res=>{
+              
+});
+
     });
 
 }
@@ -231,7 +267,8 @@ console.log(valorArestarDeCuenta);
   mostrarTabla(){
     this.mostrarPartidos();
     let tabla = document.getElementById('listadoEgresoPartidos')
-    if(tabla)  tabla.style.display = "block"; 
+    if(tabla)  tabla.style.display = "block";
+    this.generarPdf=true; 
   }
 
   onSearchPartidoDescripcion(searchDescripcion:string){
@@ -265,5 +302,148 @@ console.log(valorArestarDeCuenta);
   cerrar(){
     this.display = !this.display;
   }
+
+  imprimir(){
+
+    const encabezado = ["Descripción", "Cancha", "Categoría", "Tipo categoría", "Deporte", "Fecha", "Gasto total", "Observaciones"];
+  
+    let partidoEgresosFiltrado: Array<Partido>;
+    partidoEgresosFiltrado = new Array<Partido>();
+   
+    partidoEgresosFiltrado= this.filtroEgresosPartido(this.partidos, this.searchDescripcion, this.searchCancha, this.searchCategoria, this.searchTipoCategoria, this.searchDeporte, this.searchFecha);
+  
+   const cuerpo =  partidoEgresosFiltrado.map(
+  
+    (obj : Partido) => {
+      const datos = [
+        obj.descripcion,
+        obj.cancha,
+        obj.categoria.nombre,
+        obj.categoria.tipo,
+        obj.categoria.deporte,
+        obj.fecha,
+        obj.gastoTotal,
+        obj.observaciones
+      ]
+      return datos;
+    }
+   )
+  
+  this.rService.imprimir(encabezado, cuerpo, "Listado de gastos de partidos ", true);
+  
+  }
+  
+  filtroEgresosPartido(values: Partido[], searchDescripcion: string, searchCancha:string,searchCategoria: string, searchTipoCategoria:string, searchDeporte:string, searchFecha:string): any[] {
+
+    let filterValues=values;
+
+  if(values.length>0){
+  
+    if(searchDescripcion!=""){ 
+    values.forEach(value =>
+      {
+    let descripcion:any=value.descripcion;
+    value.descripcion= descripcion.toLowerCase();
+  
+}
+    );
+    searchDescripcion=searchDescripcion.toLowerCase();
+    filterValues= filterValues.filter(value => value.descripcion?.includes(searchDescripcion));
+  }
+
+  
+  if(searchCancha!=""){
+    
+    values.forEach(value =>
+      {
+    let cancha:any=value.cancha;
+    value.cancha= cancha.toLowerCase();
+}
+    );
+  searchCancha=searchCancha.toLowerCase();
+  filterValues=filterValues.filter(value => value.cancha?.includes(searchCancha));
+
+}
+   
+    if(searchCategoria!=""){
+     
+    filterValues=filterValues.filter(value => value.categoria.nombre.toString().includes(searchCategoria));
+  
+  }
+
+  if(searchTipoCategoria!=""){
+
+    values.forEach(value =>
+      {
+    let tipoCategoria:any=value.categoria.tipo;
+    value.categoria.tipo= tipoCategoria.toLowerCase();
+}
+    );
+  searchTipoCategoria=searchTipoCategoria.toLowerCase();
+  filterValues=filterValues.filter(value => value.categoria?.tipo.includes(searchTipoCategoria));
+
+}
+
+if(searchDeporte!=""){ 
+  
+  values.forEach(value =>
+    {
+  let deporte:any=value.categoria.deporte;
+  value.categoria.deporte = deporte.toLowerCase();
+
+}
+  );
+  searchDeporte=searchDeporte.toLowerCase();
+  filterValues= filterValues.filter(value => value.categoria.deporte?.includes(searchDeporte));
+}
+ 
+if(searchFecha!=""){ 
+
+  values.forEach(value =>
+    {
+  let fecha:any=value.fecha;
+  value.fecha = fecha.toLowerCase();
+
+}
+  );
+  searchFecha=searchFecha.toLowerCase();
+  filterValues= filterValues.filter(value => value.fecha?.includes(searchFecha));
+}
+
+}
+
+filterValues.forEach(element => {
+  element.descripcion = this.mayusculaPrimerLetra(element.descripcion);
+  element.cancha = this.mayusculaPrimerLetra(element.cancha);
+  element.categoria.tipo = this.mayusculaPrimerLetra(element.categoria.tipo);
+  element.categoria.deporte = this.mayusculaPrimerLetra(element.categoria.deporte);
+  element.fecha = this.mayusculaPrimerLetra(element.fecha);
+});
+
+return filterValues;
+
+}
+
+mayusculaPrimerLetra(string:String) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+volver(){
+
+  if(this.router.url=="/homeAdministrador/partidoEgresos/nuevo"){ 
+    this.router.navigate(['/homeAdministrador']);
+    }
+    else{
+      this.router.navigate(['/homeInvitado']);
+    }
+}
+
+idTransaccionPorPartidoYTipo(partido:Partido, tipo:String){
+
+  this.tService.mostrarTransaccionesPorPartidoYTipo(partido, tipo).subscribe(res=>{
+              
+   this.idTransaccion=res[0].id;
+  });
+}
 
 }

@@ -1,0 +1,521 @@
+<br>
+<h2> &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;   &nbsp;  &nbsp; &nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;   &nbsp;  &nbsp; &nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;   &nbsp;  &nbsp; &nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;   &nbsp;  &nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;   &nbsp; &nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;   &nbsp;  &nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;   &nbsp;  &nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;   &nbsp; 
+     Transacciones </h2>
+
+
+<br>
+<div class="container-formulario">
+    <div>
+<form action="" [formGroup]="formularioTransacciones">
+    <br>
+    <div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-list"></i>
+    </span>
+    <select formControlName="filtro" [(ngModel)]="filtro">
+        <option value="default" disabled selected="filtro">Seleccione un filtro</option>
+        <option value="Cuota entrenador"> Cuota entrenador</option>
+        <option value="Cuota jugador"> Cuota jugador</option>
+        <option value="Cuota socio"> Cuota socio</option>
+        <option value="Pago servicio"> Pago servicio</option>
+        <option value="Ingreso partido"> Ingreso partido</option>
+        <option value="Egreso partido"> Egreso partido</option>
+        <option value="Alquiler cancha"> Alquiler cancha</option>
+        <option value="Alquiler bufe"> Alquiler bufe</option>
+    </select>
+    </div>
+    <br>
+    <p-button styleClass="buscar" label="Buscar" (click)="filtrarTransacciones()" styleClass="p-button-raised"></p-button>
+</form>
+</div>
+
+<ng-template  class="table-listado" [ngIf]="displayPagoCuotaEntrenador || displayPagoCuotaJugador || displayPagoCuotaSocio">
+<div class="container_filtros">
+    <br>
+    <br>
+    <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+  
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         
+         <input type="text" class="form-select form-control-lg" name="filterName" (keyup)="onSearchJugadorName(filterPropertyName)" [(ngModel)]="filterPropertyName" placeholder="Buscar nombre..." />
+         </div>
+         <div class="p-inputgroup p-m-2">
+             <span class="p-inputgroup-addon">
+                 <i class="pi pi-search"></i>
+             </span>
+             <input type="text" class="form-select form-control-lg" name="filterApellido" (keyup)="onSearchJugadorApellido(filterPropertyApellido)" [(ngModel)]="filterPropertyApellido" placeholder="Buscar apellido..." />
+     </div>
+     <div class="p-inputgroup p-m-2">
+         <span class="p-inputgroup-addon">
+             <i class="pi pi-search"></i>
+         </span>
+         <input type="text" class="form-select form-control-lg" name="filterDocumento" (keyup)="onSearchJugadorDocumento(filterPropertyDocumento)" [(ngModel)]="filterPropertyDocumento" placeholder="Buscar DNI..." />
+ </div>
+ <div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterAnio" (keyup)="onSearchJugadorAnio(filterPropertyAnio)" [(ngModel)]="filterPropertyAnio" placeholder="Buscar año..." />
+</div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterMes" (keyup)="onSearchJugadorMes(filterPropertyMes)" [(ngModel)]="filterPropertyMes" placeholder="Buscar mes..." />
+</div>
+<div class="p-inputgroup p-m-2">
+    <span class="p-inputgroup-addon">
+        <i class="pi pi-search"></i>
+    </span>
+    <input type="text" class="form-select form-control-lg" name="filterMedioPago" (keyup)="onSearchJugadorMedioPago(filterPropertyMedioPago)" [(ngModel)]="filterPropertyMedioPago" placeholder="Buscar medio de pago..." />
+</div>
+<div *ngIf="generarPdf == true">
+    &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+    </div>
+     </div>
+    </ng-template>
+
+    <ng-template class="table-listado" [ngIf]="displayPartidoIngreso || displayPartidoEgreso">
+
+        <div class="container_filtros">
+            <br>
+            <br>
+            <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+          
+             <div class="p-inputgroup p-m-2">
+                 <span class="p-inputgroup-addon">
+                     <i class="pi pi-search"></i>
+                 </span>
+                 
+                 <input type="text" class="form-select form-control-lg" name="filterDescripcion" (keyup)="onSearchPartidoDescripcion(filterPropertyDescripcion)" [(ngModel)]="filterPropertyDescripcion" placeholder="Buscar descripcion..." 
+                 />
+                 </div>
+                 <div class="p-inputgroup p-m-2">
+                     <span class="p-inputgroup-addon">
+                         <i class="pi pi-search"></i>
+                     </span>
+                     <input type="text" class="form-select form-control-lg" name="filterCancha" (keyup)="onSearchPartidoCancha(filterPropertyCancha)" [(ngModel)]="filterPropertyCancha" placeholder="Buscar cancha..." />
+             </div>
+             <div class="p-inputgroup p-m-2">
+                <span class="p-inputgroup-addon">
+                    <i class="pi pi-search"></i>
+                </span>
+                <input type="text" class="form-select form-control-lg" name="filterCategoria" (keyup)="onSearchPartidoCategoria(filterPropertyCategoria)" [(ngModel)]="filterPropertyCategoria" placeholder="Buscar categoria..." />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-search"></i>
+            </span>
+            <input type="text" class="form-select form-control-lg" name="filterTipoCategoria" (keyup)="onSearchPartidoTipoCategoria(filterPropertyTipoCategoria)" [(ngModel)]="filterPropertyTipoCategoria" placeholder="Buscar tipo de categoria..." />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-search"></i>
+            </span>
+            <input type="text" class="form-select form-control-lg" name="filterDeporte" (keyup)="onSearchPartidoDeporte(filterPropertyDeporte)" [(ngModel)]="filterPropertyDeporte" placeholder="Buscar deporte..." />
+        </div>
+             <div class="p-inputgroup p-m-2">
+                 <span class="p-inputgroup-addon">
+                     <i class="pi pi-search"></i>
+                 </span>
+                 <input type="text" class="form-select form-control-lg" name="filterFecha" (keyup)="onSearchPartidoFecha(filterPropertyFecha)" [(ngModel)]="filterPropertyFecha" placeholder="Buscar fecha..." />
+         </div>
+         <div *ngIf="generarPdf == true">
+            &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+            </div>
+             </div>
+
+    </ng-template>
+
+    <ng-template class="table-listado" [ngIf]="displayAlquilerBufe">
+
+        <div class="container_filtros">
+            <br>
+            <br>
+            <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+          
+             <div class="p-inputgroup p-m-2">
+                 <span class="p-inputgroup-addon">
+                     <i class="pi pi-search"></i>
+                 </span>
+                 
+                 <input type="text" class="form-select form-control-lg" name="filterFecha" (keyup)="onSearchAlquilerBufeFecha(filterPropertyFecha)" [(ngModel)]="filterPropertyFecha" placeholder="Buscar fecha..." 
+                 />
+                 </div>
+         <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-search"></i>
+            </span>
+            <input type="text" class="form-select form-control-lg" name="filterNumeroBufe" (keyup)="onSearchAlquilerBufeNumeroBufe(filterPropertyNumeroBufe)" [(ngModel)]="filterPropertyNumeroBufe" placeholder="Buscar número de bufé..." />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-search"></i>
+            </span>
+            <input type="text" class="form-select form-control-lg" name="filterMedioPago" (keyup)="onSearchAlquilerBufeMedioPago(filterPropertyMedioPago)" [(ngModel)]="filterPropertyMedioPago" placeholder="Buscar medio de pago..." />
+        </div>
+        <div *ngIf="generarPdf == true">
+            &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+            </div>
+             </div>
+
+    </ng-template>
+
+    <ng-template class="table-listado" [ngIf]="displayAlquilerCancha">
+
+        <div class="container_filtros">
+            <br>
+            <br>
+            <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+          
+             <div class="p-inputgroup p-m-2">
+                 <span class="p-inputgroup-addon">
+                     <i class="pi pi-search"></i>
+                 </span>
+                 
+                 <input type="text" class="form-select form-control-lg" name="filterFecha" (keyup)="onSearchAlquilerCanchaFecha(filterPropertyFecha)" [(ngModel)]="filterPropertyFecha" placeholder="Buscar fecha..." 
+                 />
+                 </div>
+                 <div class="p-inputgroup p-m-2">
+                     <span class="p-inputgroup-addon">
+                         <i class="pi pi-search"></i>
+                     </span>
+                     <input type="text" class="form-select form-control-lg" name="filterHoraInicio" (keyup)="onSearchAlquilerCanchaHoraInicio(filterPropertyHoraInicio)" [(ngModel)]="filterPropertyHoraInicio" placeholder="Buscar hora de inicio..." />
+             </div>
+             <div class="p-inputgroup p-m-2">
+                 <span class="p-inputgroup-addon">
+                     <i class="pi pi-search"></i>
+                 </span>
+                 <input type="text" class="form-select form-control-lg" name="filterHoraFin" (keyup)="onSearchAlquilerCanchaHoraFin(filterPropertyHoraFin)" [(ngModel)]="filterPropertyHoraFin" placeholder="Buscar hora de finalización..." />
+         </div>
+         <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-search"></i>
+            </span>
+            <input type="text" class="form-select form-control-lg" name="filterNumeroCancha" (keyup)="onSearchAlquilerCanchaNumeroCancha(filterPropertyNumeroCancha)" [(ngModel)]="filterPropertyNumeroCancha" placeholder="Buscar número de cancha..." />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-search"></i>
+            </span>
+            <input type="text" class="form-select form-control-lg" name="filterMedioPago" (keyup)="onSearchAlquilerCanchaMedioPago(filterPropertyMedioPago)" [(ngModel)]="filterPropertyMedioPago" placeholder="Buscar medio de pago..." />
+        </div>
+        <div *ngIf="generarPdf == true">
+            &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+            </div>
+             </div>
+
+    </ng-template>
+
+    <ng-template class="table-listado" [ngIf]="displayPagoServicio">
+
+        <div class="container_filtros">
+            <br>
+            <br>
+            <h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Búsqueda por filtros</h2>
+          
+             <div class="p-inputgroup p-m-2">
+                 <span class="p-inputgroup-addon">
+                     <i class="pi pi-search"></i>
+                 </span>
+                 
+                 <input type="text" class="form-select form-control-lg" name="filterDescripcion" (keyup)="onSearchPagoServicioDescripcion(filterPropertyDescripcion)" [(ngModel)]="filterPropertyDescripcion" placeholder="Buscar descripcion..." 
+                 />
+                 </div>
+                 <div class="p-inputgroup p-m-2">
+                     <span class="p-inputgroup-addon">
+                         <i class="pi pi-search"></i>
+                     </span>
+                     <input type="text" class="form-select form-control-lg" name="filterMedioPago" (keyup)="onSearchPagoServicioMedioPago(filterPropertyMedioPago)" [(ngModel)]="filterPropertyMedioPago" placeholder="Buscar medio de pago..." />
+             </div>
+             <div class="p-inputgroup p-m-2">
+                 <span class="p-inputgroup-addon">
+                     <i class="pi pi-search"></i>
+                 </span>
+                 <input type="text" class="form-select form-control-lg" name="filterFecha" (keyup)="onSearchPagoServicioFecha(filterPropertyFecha)" [(ngModel)]="filterPropertyFecha" placeholder="Buscar fecha..." />
+         </div>
+         <div *ngIf="generarPdf == true">
+            &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+            </div>
+             </div>
+
+    </ng-template>
+</div>
+
+<p-button  styleClass="" id="btn_volver" label="Volver" (click)="volver()" styleClass="p-button-raised"></p-button>
+ <br>
+
+
+
+           <ng-container *ngIf="displayPagoCuotaEntrenador">  </ng-container>
+
+            <ng-container  *ngIf="displayPagoCuotaJugador" > </ng-container>
+              
+            <ng-container *ngIf="displayPagoCuotaSocio">  </ng-container>
+
+            <ng-container *ngIf="displayPagoServicio">  </ng-container>
+
+            <ng-container  *ngIf="displayPartidoIngreso"> </ng-container>
+              
+            <ng-container *ngIf="displayPartidoEgreso">  </ng-container>
+
+            <ng-container *ngIf="displayAlquilerCancha">  </ng-container>
+
+            <ng-container  *ngIf="displayAlquilerBufe"> </ng-container>
+       
+
+    <ng-template  class="table-listado" [ngIf]="displayPagoCuotaEntrenador">
+     
+    <table class="table-listado">
+   
+        <thead>
+            <tr>
+
+    <th>Documento</th> 
+   <th>Nombre</th> 
+   <th>Apellido</th> 
+   <th>Mes</th> 
+   <th>Año</th>
+   <th>Importe</th>
+   <th>Medio de pago</th>
+   <th>Fecha</th>
+
+</tr>
+</thead>
+<tbody>
+    <tr *ngFor="let transaccion of transacciones | filtroPagoCuota:searchName:searchApellido:searchDocumento:searchAnio:searchMes:searchMedioPago">
+        <td>{{ transaccion.documentoEntrenador }}</td> 
+        <td>{{ transaccion.nombreEntrenador }}</td> 
+        <td>{{ transaccion.apellidoEntrenador }}</td> 
+        <td>{{ transaccion.mesCuota }}</td> 
+        <td>{{ transaccion.anioCuota }}</td> 
+        <td>{{ transaccion.importe }}</td> 
+        <td>{{ transaccion.medioPago }}</td> 
+        <td>{{ transaccion.fecha }}</td> 
+    </tr>
+</tbody>
+</table>
+</ng-template>
+
+<ng-template  class="table-listado" [ngIf]="displayPagoCuotaJugador">
+     
+    <table class="table-listado">
+   
+        <thead>
+            <tr>
+
+    <th>Documento</th> 
+   <th>Nombre</th> 
+   <th>Apellido</th> 
+   <th>Mes</th> 
+   <th>Año</th>
+   <th>Importe</th>
+   <th>Medio de pago</th>
+   <th>Fecha</th>
+
+</tr>
+</thead>
+<tbody>
+    <tr *ngFor="let transaccion of transacciones | filtroPagoCuota:searchName:searchApellido:searchDocumento:searchAnio:searchMes:searchMedioPago">
+        <td>{{ transaccion.documentoJugador }}</td> 
+        <td>{{ transaccion.nombreJugador }}</td> 
+        <td>{{ transaccion.apellidoJugador }}</td> 
+        <td>{{ transaccion.mesCuota }}</td> 
+        <td>{{ transaccion.anioCuota }}</td> 
+        <td>{{ transaccion.importe }}</td> 
+        <td>{{ transaccion.medioPago }}</td> 
+        <td>{{ transaccion.fecha }}</td> 
+    </tr>
+</tbody>
+</table>
+</ng-template>
+
+<ng-template  class="table-listado" [ngIf]="displayPagoCuotaSocio">
+     
+    <table class="table-listado">
+   
+        <thead>
+            <tr>
+
+    <th>Documento</th> 
+   <th>Nombre</th> 
+   <th>Apellido</th> 
+   <th>Mes</th> 
+   <th>Año</th>
+   <th>Importe</th>
+   <th>Medio de pago</th>
+   <th>Fecha</th>
+
+</tr>
+</thead>
+<tbody>
+    <tr *ngFor="let transaccion of transacciones | filtroPagoCuota:searchName:searchApellido:searchDocumento:searchAnio:searchMes:searchMedioPago">
+        <td>{{ transaccion.documentoSocio }}</td> 
+        <td>{{ transaccion.nombreSocio }}</td> 
+        <td>{{ transaccion.apellidoSocio }}</td> 
+        <td>{{ transaccion.mesCuota }}</td> 
+        <td>{{ transaccion.anioCuota }}</td> 
+        <td>{{ transaccion.importe }}</td> 
+        <td>{{ transaccion.medioPago }}</td> 
+        <td>{{ transaccion.fecha }}</td> 
+    </tr>
+</tbody>
+</table>
+</ng-template>
+
+<ng-template  class="table-listado" [ngIf]="displayPagoServicio">
+     
+    <table class="table-listado">
+   
+        <thead>
+            <tr>
+
+    <th>Descripcion</th> 
+   <th>Importe</th>
+   <th>Medio de pago</th>
+   <th>Fecha</th>
+
+</tr>
+</thead>
+<tbody>
+    <tr *ngFor="let transaccion of transacciones | filtroPagoServicio:searchDescripcion:searchMedioPago:searchFecha">
+        <td>{{ transaccion.descripcion }}</td> 
+        <td>{{ transaccion.importe }}</td> 
+        <td>{{ transaccion.medioPago }}</td> 
+        <td>{{ transaccion.fecha }}</td> 
+    </tr>
+</tbody>
+</table>
+</ng-template>
+
+<ng-template  class="table-listado" [ngIf]="displayAlquilerBufe">
+     
+    <table class="table-listado">
+   
+        <thead>
+            <tr>
+
+    <th>Bufé</th> 
+   <th>Fecha</th> 
+   <th>Importe</th> 
+   <th>Medio de pago</th>
+
+</tr>
+</thead>
+<tbody>
+    <tr *ngFor="let transaccion of transacciones | filtroAlquilerBufe:searchFecha:searchNumeroBufe:searchMedioPago">
+        <td>{{ transaccion.numeroBufe }}</td> 
+        <td>{{ transaccion.fecha }}</td> 
+        <td>{{ transaccion.importe }}</td> 
+        <td>{{ transaccion.medioPago }}</td> 
+        
+    </tr>
+</tbody>
+</table>
+</ng-template>
+
+<ng-template  class="table-listado" [ngIf]="displayAlquilerCancha">
+     
+    <table class="table-listado">
+   
+        <thead>
+            <tr>
+
+    <th>Cancha</th> 
+   <th>Fecha</th> 
+   <th>Hora inicio</th> 
+   <th>Hora fin</th> 
+   <th>importe</th>
+   <th>Medio de pago</th>
+   <th>Observaciones</th>
+  
+
+</tr>
+</thead>
+<tbody>
+    <tr *ngFor="let transaccion of transacciones | filtroAlquilerCancha:searchFecha:searchHoraInicio:searchHoraFin:searchNumeroCancha:searchMedioPago">
+        <td>{{ transaccion.numeroCancha }}</td> 
+        <td>{{ transaccion.fecha }}</td> 
+        <td>{{ transaccion.horaInicio }}</td> 
+        <td>{{ transaccion.horaFin }}</td> 
+        <td>{{ transaccion.importe }}</td> 
+        <td>{{ transaccion.medioPago }}</td> 
+        <td>{{ transaccion.observaciones }}</td> 
+    
+    </tr>
+</tbody>
+</table>
+</ng-template>
+
+<ng-template  class="table-listado" [ngIf]="displayPartidoEgreso">
+     
+    <table class="table-listado">
+   
+        <thead>
+            <tr>
+
+   <th>Descripcion</th> 
+   <th>Cancha</th> 
+   <th>Categoria</th> 
+   <th>Tipo Categoría</th> 
+   <th>Deporte</th>
+   <th>Fecha</th>
+   <th>Seguridad</th>
+   <th>Médicos</th>
+   <th>Árbitros</th>
+   <th>Extra</th>
+   <th>Observaciones</th>
+
+</tr>
+</thead>
+<tbody>
+    <tr *ngFor="let transaccion of transacciones | filtroPartido:searchDescripcion:searchCancha:searchCategoria:searchTipoCategoria:searchDeporte:searchFecha">
+        <td>{{ transaccion.descripcion }}</td> 
+        <td>{{ transaccion.cancha }}</td> 
+        <td>{{ transaccion.nombreCategoria }}</td> 
+        <td>{{ transaccion.tipoCategoria }}</td> 
+        <td>{{ transaccion.deporte }}</td> 
+        <td>{{ transaccion.fecha }}</td> 
+        <td>{{ transaccion.seguridad }}</td> 
+        <td>{{ transaccion.medicos }}</td> 
+        <td>{{ transaccion.arbitros }}</td> 
+        <td>{{ transaccion.extra }}</td> 
+        <td>{{ transaccion.observaciones }}</td> 
+    </tr>
+</tbody>
+</table>
+</ng-template>
+
+<ng-template  class="table-listado" [ngIf]="displayPartidoIngreso">
+     
+    <table class="table-listado">
+   
+        <thead>
+            <tr>
+
+                <th>Descripcion</th> 
+                <th>Cancha</th> 
+                <th>Categoria</th> 
+                <th>Tipo Categoría</th> 
+                <th>Deporte</th>
+                <th>Fecha</th>
+                <th>Entradas</th>
+
+</tr>
+</thead>
+<tbody>
+    <tr *ngFor="let transaccion of transacciones | filtroPartido:searchDescripcion:searchCancha:searchCategoria:searchTipoCategoria:searchDeporte:searchFecha">
+        <td>{{ transaccion.descripcion }}</td> 
+        <td>{{ transaccion.cancha }}</td> 
+        <td>{{ transaccion.nombreCategoria }}</td> 
+        <td>{{ transaccion.tipoCategoria }}</td> 
+        <td>{{ transaccion.deporte }}</td> 
+        <td>{{ transaccion.fecha }}</td> 
+        <td>{{ transaccion.entradas }}</td> 
+    </tr>
+</tbody>
+</table>
+</ng-template>

@@ -5,7 +5,7 @@ import { Categoria } from 'src/app/modelo/Categoria';
 import { EntrenadorServicio } from 'src/app/servicio/entrenador.servicio';
 import { CategoriaServicio } from 'src/app/servicio/categoria.servicio';
 import { SocioCuota } from 'src/app/modelo/SocioCuota';
-import { TitleStrategy } from '@angular/router';
+import { Router, TitleStrategy } from '@angular/router';
 import Swal from 'sweetalert2';
 import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
 
@@ -47,7 +47,7 @@ export class BodyEntrenadorComponent {
   generarPdf:boolean=false;
 
 
-constructor(private fb:FormBuilder, private eService: EntrenadorServicio, private cService: CategoriaServicio, private rService:ReporteServicio){
+constructor(private fb:FormBuilder, private eService: EntrenadorServicio, private cService: CategoriaServicio, private rService:ReporteServicio, private router:Router){
 
   this.entrenadores = new Array<Entrenador>();
   this.catAsig = new Array<number>();
@@ -469,6 +469,16 @@ filtroEntrenadores(values: any[], searchName: string, searchApellido:string, sea
   
     mayusculaPrimerLetra(string:String) {
       return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    volver(){
+
+      if(this.router.url=="/homeAdministrador/entrenador/nuevo"){ 
+        this.router.navigate(['/homeAdministrador']);
+        }
+        else{
+          this.router.navigate(['/homeInvitado']);
+        }
     }
 
  }

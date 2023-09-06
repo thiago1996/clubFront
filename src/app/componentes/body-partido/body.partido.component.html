@@ -54,7 +54,7 @@
     <p-calendar [showIcon]="true" placeholder="Fecha" formControlName ="fecha"></p-calendar>
 </div>
       
-
+<br>
     <p-button styleClass="crear" label="Crear" (click)="crearPartido()" styleClass="p-button-raised"></p-button>
     <p-button styleClass="datos" label="Datos" (click)="mostrarTabla()" styleClass="p-button-raised"></p-button>
 </form>
@@ -107,9 +107,10 @@
     &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
     </div>
      </div>
+    </div>
+     <p-button  styleClass="" id="btn_volver" label="Volver" (click)="volver()" styleClass="p-button-raised"></p-button>
 
-</div>
-<br>
+     <br>
 <div id="listadoPartidos" style="display:none;">
     <table class="table-listado">
         <thead>

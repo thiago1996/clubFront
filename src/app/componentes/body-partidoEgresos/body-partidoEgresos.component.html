@@ -42,8 +42,12 @@
          </span>
          <input type="text" class="form-select form-control-lg" name="filterFecha" (keyup)="onSearchPartidoFecha(filterPropertyFecha)" [(ngModel)]="filterPropertyFecha" placeholder="Buscar fecha..." />
  </div>
+ <div *ngIf="generarPdf == true">
+    &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+    </div>
      </div>
-
+     <p-button  styleClass="" id="btn_volver" label="Volver" (click)="volver()" styleClass="p-button-raised"></p-button>
+     <br>
 <div id="listadoEgresoPartidos" style="display:block;">
     <table class="table-listado">
         <thead>
@@ -52,12 +56,12 @@
                 <th>Descripcion</th>
                 <th>Cancha</th>
                 <th>Categoria</th>
-                <th>Tipo Categoria</th>
+                <th>Tipo</th>
                 <th>Deporte</th>
                 <th>Fecha</th>
                 <th>Seguridad</th>
+                <th>Médicos</th>
                 <th>Árbitros</th>
-                <th>Medicos</th>
                 <th>Extra</th>
                 <th>Observaciones</th>
                 <th>Editar</th>
@@ -73,8 +77,8 @@
                 <td>{{ partido.categoria?.deporte }} </td>
                 <td>{{ partido.fecha }}</td>
                 <td>{{ partido.gastoSeguridad }}</td>
-                <td>{{ partido.gastoArbitros }}</td>
                 <td>{{ partido.gastoMedicos }}</td>
+                <td>{{ partido.gastoArbitros }}</td>
                 <td>{{ partido.gastoExtra }}</td>
                 <td>{{ partido.observaciones }}</td>
 

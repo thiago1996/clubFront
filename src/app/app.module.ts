@@ -13,6 +13,7 @@ import { DialogModule } from 'primeng/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
+import { PasswordModule } from 'primeng/password';
 import { BodyJugadorComponent } from './componentes/body-jugador/body.jugador.component';
 import { BodyEntrenadorComponent } from './componentes/body-entrenador/body.entrenador.component';
 import { BodyCategoriaComponent } from './componentes/body-categoria/body.categoria.component';
@@ -38,6 +39,12 @@ import { BodyBufeComponent } from './componentes/body-bufe/body.bufe.component';
 import { BodyAlquilerBufeComponent } from './componentes/body-alquilerbufe/body.alquilerBufe.component';
 import { FiltrarAlquilerBufePipe } from './pipes/filtrar-alquilerBufe.pipe';
 import { BodyCuentaComponent } from './componentes/body-cuenta/body.cuenta.component';
+import { NavMenuAdministradorComponent } from './componentes/navMenuAdministrador/navMenuAdministrador.component';
+import { UsuarioComponent } from './componentes/usuario/usuario.component';
+import { LoginComponent } from './componentes/login/login.component';
+import { NavMenuInvitadoComponent } from './componentes/navMenuInvitado/navMenuInvitado.component';
+import { BodyTransaccionComponent } from './componentes/body-transaccion/body-transaccion.component';
+import { FiltrarTransaccionPagoCuotaPipe } from './pipes/filtrar-transaccion-pagocuota.pipe';
 
 
 @NgModule({
@@ -68,7 +75,13 @@ import { BodyCuentaComponent } from './componentes/body-cuenta/body.cuenta.compo
     BodyBufeComponent,
     BodyAlquilerBufeComponent,
     FiltrarAlquilerBufePipe,
-    BodyCuentaComponent
+    BodyCuentaComponent,
+    NavMenuAdministradorComponent,
+    UsuarioComponent,
+    LoginComponent,
+    NavMenuInvitadoComponent,
+    BodyTransaccionComponent,
+    FiltrarTransaccionPagoCuotaPipe
   ],
   imports: [
     BrowserModule,
@@ -82,7 +95,8 @@ import { BodyCuentaComponent } from './componentes/body-cuenta/body.cuenta.compo
     BrowserAnimationsModule,
     MenuModule,
     MenubarModule,
-    CalendarModule
+    CalendarModule,
+    PasswordModule
     
   ],
   providers: [],

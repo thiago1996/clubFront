@@ -15,6 +15,10 @@ tr, td{
 
   margin-left: 80px;
  }
+
+ #btn_volver{
+    margin-left: 90%;
+   }
 } 
 
 #modificar {

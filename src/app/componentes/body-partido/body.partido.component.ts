@@ -1,10 +1,14 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, NonNullableFormBuilder, FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Categoria } from 'src/app/modelo/Categoria';
 import { Partido } from 'src/app/modelo/Partido';
+import { Transaccion } from 'src/app/modelo/Transaccion';
 import { CategoriaServicio } from 'src/app/servicio/categoria.servicio';
+import { CuentaServicio } from 'src/app/servicio/cuenta.servicio';
 import { PartidoServicio } from 'src/app/servicio/partido.servicio';
 import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
+import { TransaccionServicio } from 'src/app/servicio/transaccion.servicio';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -55,9 +59,11 @@ export class BodyPartidoComponent {
   searchDeporte:string="";
   searchFecha:string="";
   generarPdf:boolean=false;
+  idTransaccion:any;
+  transacciones:Array<Transaccion>;
 
 
-  constructor(private fb:FormBuilder, private pService: PartidoServicio, private caService: CategoriaServicio, private rService:ReporteServicio){
+  constructor(private fb:FormBuilder, private pService: PartidoServicio, private cService:CuentaServicio, private caService: CategoriaServicio, private tService:TransaccionServicio, private rService:ReporteServicio, private router:Router){
   
     this.formularioPartido = fb.group({
 
@@ -74,6 +80,7 @@ export class BodyPartidoComponent {
   this.categoriasPorParametros=[];
   this.partidos= new Array<Partido>();
   this.categorias= new Array<Categoria>();
+  this.transacciones = new Array<Transaccion>();
 
   this.mostrarCategorias();
 
@@ -209,18 +216,34 @@ export class BodyPartidoComponent {
         eliminarPartido(partido:Partido){
 
           let id:any;
-          let descripcion:any = partido.descripcion;
-          let id_categoria:any = partido.categoria?.id;
-          let cancha:any = partido.cancha;
-          let fecha:any = partido.fecha;
-      
+         // let descripcion:any = partido.descripcion;
+          //let id_categoria:any = partido.categoria?.id;
+          //let cancha:any = partido.cancha;
+          //let fecha:any = partido.fecha;
+          let id_transaccion:any;
+          let totalEgresos:number;
+          let ingresoEntradas:any;
+        
+          id = partido.id;
+          totalEgresos=partido.gastoArbitros+partido.gastoMedicos+partido.gastoSeguridad+partido.gastoExtra;
+          ingresoEntradas=partido.ingresoEntradas;
+
+          this.idTransaccionPorPartido(partido);
           
-              this.buscarIdPartido(descripcion, id_categoria, cancha, fecha);
+          setTimeout(() => {
+  
+          this.transacciones.forEach(element => {
+          
+          id_transaccion = element.id;
+          this.tService.eliminarTransaccion(id_transaccion).subscribe(res =>{
+          });
+              });
+            
+            }, 300);
+          //    this.buscarIdPartido(descripcion, id_categoria, cancha, fecha);
               setTimeout(() => {
-                
-                console.log(this.id_partido);
-      
-              this.pService.eliminarPartido(this.id_partido).subscribe(res =>{
+   
+              this.pService.eliminarPartido(id).subscribe(res =>{
                 Swal.fire({
                   position: 'center',
                   icon: 'success',
@@ -230,11 +253,19 @@ export class BodyPartidoComponent {
                 })
              
               this.mostrarPartidos();
+
+              this.cService.ingresoEfectivo(totalEgresos).subscribe(res =>{
+              })
+              setTimeout(() => {
+              this.cService.egresoEfectivo(ingresoEntradas).subscribe(res =>{
+              })
+            }, 300);
+            }, );
+            //  this.id_partido=undefined;
+         //       });
+        }, 1000);
               
-              this.id_partido=undefined;
-                });
-              
-            }, 500);
+           
       
       }
       
@@ -520,6 +551,26 @@ export class BodyPartidoComponent {
     mayusculaPrimerLetra(string:String) {
       return string.charAt(0).toUpperCase() + string.slice(1);
     }
+
+    volver(){
+
+      if(this.router.url=="/homeAdministrador/partido/nuevo"){ 
+        this.router.navigate(['/homeAdministrador']);
+        }
+        else{
+          this.router.navigate(['/homeInvitado']);
+        }
+    }
+
+    idTransaccionPorPartido(partido:Partido){
+
+      this.tService.mostrarTransaccionesPorPartido(partido).subscribe(res=>{
+                
+       this.transacciones = res; 
+       this.idTransaccion=res[0].id;
+      });
+    }
+    
 }
 
 

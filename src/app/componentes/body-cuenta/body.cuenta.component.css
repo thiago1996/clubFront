@@ -20,6 +20,10 @@
 
   margin-left: 30px;
  }
+
+ #btn_volver{
+    margin-left: 90%;
+   }
 } 
 
 #cancelar {

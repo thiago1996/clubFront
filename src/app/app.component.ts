@@ -7,7 +7,7 @@ import { MenuItem } from 'primeng/api';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'frontClub';
+  /*title = 'frontClub';
 
   items:MenuItem[] =[];
 
@@ -132,6 +132,7 @@ export class AppComponent {
   ]
 
   }
+  */
 }
 
 

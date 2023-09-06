@@ -6,6 +6,10 @@ import { FormGroup, FormBuilder, Validators, NonNullableFormBuilder, FormControl
 import Swal from 'sweetalert2';
 import { CanchaServicio } from 'src/app/servicio/cancha.servicio';
 import { CuentaServicio } from 'src/app/servicio/cuenta.servicio';
+import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
+import { Router } from '@angular/router';
+import { Transaccion } from 'src/app/modelo/Transaccion';
+import { TransaccionServicio } from 'src/app/servicio/transaccion.servicio';
 
 @Component({
   selector: 'app-body.alquilerCancha',
@@ -37,8 +41,10 @@ export class BodyAlquilerCanchaComponent {
   searchHoraFin:string="";
   searchNumeroCancha:string="";
   searchMedioPago:string="";
+  generarPdf:boolean=false;
+  idTransaccion:any;
 
-  constructor(private fb:FormBuilder, private acService: AlquilerCanchaServicio, private caService: CanchaServicio, private cuService: CuentaServicio ){
+  constructor(private fb:FormBuilder, private acService: AlquilerCanchaServicio, private caService: CanchaServicio, private cuService: CuentaServicio, private rService: ReporteServicio, private tService:TransaccionServicio, private router:Router){
 
       this.alquileresCancha=[];
       this.display = false;
@@ -96,7 +102,11 @@ export class BodyAlquilerCanchaComponent {
       let segundosInicialString="";
       let minutosFinalString="";
       let segundosFinalString="";
-      
+      let transaccion:Transaccion;
+      let id_cancha:any;
+      let canchas:Array<Cancha>=[];
+
+      transaccion = new Transaccion();
      
       //let control:Boolean=false;
       let alquilerCancha:AlquilerCancha;
@@ -196,20 +206,22 @@ horaFinal = horaFin+":"+minutosFinalString+":"+segundosFinalString;
     
      this.caService.mostrarCanchasPorNumero(numeroCancha).subscribe(res =>{
     
-       this.canchas = res;
+       canchas = res;
      
       });
 
       setTimeout(() => {
         
-      alquilerCancha.cancha=this.canchas[0];
-      alquilerCancha.numeroCancha=this.canchas[0].numero;
+      alquilerCancha.cancha=canchas[0];
+      alquilerCancha.numeroCancha=canchas[0].numero;
       alquilerCancha.fecha=fechaString;
       alquilerCancha.horaInicio=horaInicial;
       alquilerCancha.horaFin=horaFinal;
       alquilerCancha.importe=importe;
       alquilerCancha.medioPago=this.medioPago;
       alquilerCancha.observaciones=observaciones;
+
+      id_cancha=canchas[0].id;
     
       console.log(alquilerCancha);
       this.acService.crearAlquilerCancha(alquilerCancha).subscribe(res =>{
@@ -234,7 +246,29 @@ horaFinal = horaFin+":"+minutosFinalString+":"+segundosFinalString;
           });
          }
         this.mostrarAlquileresCancha();
-        
+
+        this.acService.buscarPorParametros(alquilerCancha.fecha, alquilerCancha.horaInicio, alquilerCancha.horaFin, id_cancha).subscribe( res=> {
+
+          console.log(res[0].id);
+          alquilerCancha.id = res[0].id;
+        });
+
+        setTimeout(() => {   
+       
+        transaccion.tipo="Ingreso";
+        transaccion.alquilerCancha=alquilerCancha;
+        transaccion.fecha=alquilerCancha.fecha;
+        transaccion.medioPago=alquilerCancha.medioPago;
+        transaccion.importe=importe;
+        transaccion.descripcion="Cancha "+" "+alquilerCancha.cancha?.numero + " "+ alquilerCancha.horaInicio+ " "+alquilerCancha.horaFin;
+
+        this.tService.crearTransaccion(transaccion).subscribe(res=>{
+    
+        });
+      }, 300);
+
+this.formularioAlquilerCancha.reset();
+
       });
 
     }, 500);
@@ -276,58 +310,55 @@ mostrarTabla(){
   this.mostrarAlquileresCancha();
   let tabla = document.getElementById('listadoAlquileresCancha')
   if(tabla)  tabla.style.display = "block"; 
+  this.generarPdf=true;
 }
 
 eliminarAlquilerCancha(alquilerCancha:AlquilerCancha){
 
   let id:any;
-  id = alquilerCancha.cancha?.id;
   let importe:any;
   importe = alquilerCancha.importe;
-  let alquilerDeCancha:AlquilerCancha;
-  let fecha:any;
-  fecha=alquilerCancha.fecha;
-  let horaInicio:any;
-  horaInicio=alquilerCancha.horaInicio;
-  let horaFin:any;
-  horaFin=alquilerCancha.horaFin;
-  alquilerDeCancha = new AlquilerCancha();
-  let idAlquilerCancha:any;
+  id=alquilerCancha.id;
 
-  this.acService.buscarPorParametros(fecha, horaInicio, horaFin, id).subscribe( res=> {
-
-    alquilerDeCancha.id = res[0].id;
-  });
-  
+  this.idTransaccionPorIdAlquilerCancha(id);
+   
   setTimeout(() => {
-    
-console.log(alquilerDeCancha.id);    
-idAlquilerCancha = alquilerDeCancha.id;
-this.acService.eliminarAlquilerCancha(idAlquilerCancha).subscribe( res=>{
-
-  Swal.fire({
-    position:'center',
-    icon: 'success',
-    title: 'Alquiler eliminado con éxito!',
-    showConfirmButton: false,
-    timer: 1500
-  })
  
-  this.mostrarAlquileresCancha();
+    console.log(this.idTransaccion);
+   this.tService.eliminarTransaccion(this.idTransaccion).subscribe(res => {
+      setTimeout(() => {
+        
+      
+this.acService.eliminarAlquilerCancha(id) .subscribe(res => {
 
-  if(alquilerCancha.medioPago=="Efectivo"){
-    this.cuService.egresoEfectivo(importe).subscribe(res => {
-    });
-  }
-  else{
-    this.cuService.egresoDebito(importe).subscribe(res => {
-    });
-  
-  }
+    Swal.fire({
+      position:'center',
+      icon: 'success',
+      title: 'Alquiler eliminado con éxito!',
+      showConfirmButton: false,
+      timer: 1500
+    })
+    this.mostrarAlquileresCancha();
 
-});
-}, 500);
-  
+    if(alquilerCancha.medioPago=="Efectivo"){
+      this.cuService.egresoEfectivo(importe).subscribe(res => {
+      });
+    }
+    else{
+      this.cuService.egresoDebito(importe).subscribe(res => {
+      });
+    
+    
+    }
+
+  });
+
+}, 300);
+
+   });
+
+  }, 300);
+
 }
 modificarAlquilerCancha(){
 
@@ -359,11 +390,12 @@ modificarAlquilerCancha(){
     let segundosInicialString="";
     let minutosFinalString="";
     let segundosFinalString="";
-
+    let transaccion:Transaccion;
     let control=false;
 
     let alquilerCancha:AlquilerCancha;
     
+    transaccion = new Transaccion();
     alquilerCancha = new AlquilerCancha();
 
     importe=this.formularioModificarAlquilerCancha.get('importe')?.value;
@@ -476,11 +508,8 @@ modificarAlquilerCancha(){
       this.formularioModificarAlquilerCancha.reset();
       this.mostrarCanchas();
 
-      console.log(this.medioPagoAModificar);
-      console.log(medioPago);
-      console.log(this.importeAModificar);
-      console.log(importe);
-
+      this.idTransaccionPorIdAlquilerCancha(this.idAlquilerCanchaAModificar);  
+     
       if(this.medioPagoAModificar == medioPago){
         if(this.importeAModificar!=importe){
           if(this.medioPagoAModificar == "Efectivo"){
@@ -543,6 +572,22 @@ modificarAlquilerCancha(){
             }
         }
       }
+
+      setTimeout(() => {
+        
+      transaccion.tipo="Ingreso";
+      transaccion.id=this.idTransaccion;
+      transaccion.alquilerCancha=alquilerCancha;
+      transaccion.fecha=alquilerCancha.fecha;
+      transaccion.medioPago=alquilerCancha.medioPago;
+      transaccion.importe=importe;
+      transaccion.descripcion="Cancha "+" "+alquilerCancha.cancha?.numero + " "+ alquilerCancha.horaInicio+ " "+alquilerCancha.horaFin;
+
+      console.log(transaccion);
+      this.tService.crearTransaccion(transaccion).subscribe(res=>{
+  
+      });
+    }, 300);
    
     });
 
@@ -635,5 +680,134 @@ convertDateFormat(fecha:String) {
 cerrar(){
   this.display = !this.display;
 }
+
+imprimir(){
+
+  const encabezado = ["Cancha", "Fecha", "Hora inicio", "Hora fin", "Importe", "Pago", "Observaciones",];
+
+  let alquilerCanchaFiltrado: Array<AlquilerCancha>;
+  alquilerCanchaFiltrado = new Array<AlquilerCancha>();
+ 
+  alquilerCanchaFiltrado= this.filtroAlquilerCancha(this.alquileresCancha, this.searchFecha, this.searchHoraInicio, this.searchHoraFin, this.searchNumeroCancha, this.searchMedioPago);
+
+ const cuerpo =  alquilerCanchaFiltrado.map(
+
+  (obj : AlquilerCancha) => {
+    const datos = [
+      obj.cancha?.numero,
+      obj.fecha,
+      obj.horaInicio,
+      obj.horaFin,
+      obj.importe,
+      obj.medioPago,
+      obj.observaciones
+    ]
+    return datos;
+  }
+ )
+
+this.rService.imprimir(encabezado, cuerpo, "Listado de alquileres de cancha", true);
+
+}
+
+filtroAlquilerCancha(values: AlquilerCancha[], searchFecha:string, searchHoraInicio:string, searchHoraFin:string, searchNumeroCancha:string, searchMedioPago:string) : any[]{
+
+  let filterValues=values;
+
+
+  if(values.length>0){
+  
+    if(searchFecha!=""){ 
+    searchFecha = searchFecha.toLowerCase();
+    values.forEach(value =>
+      {
+    let fecha:any=value.fecha;
+    value.fecha= fecha.toLowerCase();
+  
+}
+    );
+    //searchName=searchName.toLowerCase();
+    filterValues= filterValues.filter(value => value.fecha?.includes(searchFecha));
+
+
+  }
+    
+    if(searchHoraInicio!=""){
+      searchHoraInicio = searchHoraInicio.toLowerCase();
+      values.forEach(value =>
+        {
+      let horaInicio:any=value.horaInicio;
+      value.horaInicio= horaInicio.toLowerCase();
+  }
+      );
+    //searchHoraInicio=searchHoraInicio.toLowerCase();
+    filterValues=filterValues.filter(value => value.horaInicio?.includes(searchHoraInicio));
+    
+    }
+
+    if(searchHoraFin!=""){
+      searchHoraFin = searchHoraFin.toLowerCase();
+      values.forEach(value =>
+        {
+      let horaFin:any=value.horaFin;
+      value.horaFin= horaFin.toLowerCase();
+  }
+      );
+    //searchHoraInicio=searchHoraInicio.toLowerCase();
+    filterValues=filterValues.filter(value => value.horaFin?.includes(searchHoraFin));
+    
+    }
+
+   
+  if(searchNumeroCancha.toString()!=""){ 
+   
+    filterValues= filterValues.filter(value => value.numeroCancha?.toString().includes(searchNumeroCancha));
+  }
+
+  if(searchMedioPago!=""){
+    searchMedioPago=searchMedioPago.toLowerCase();
+    values.forEach(value =>
+      {
+    let medioPago:any=value.medioPago;
+    value.medioPago= medioPago.toLowerCase();
+}
+    );
+  //searchHoraInicio=searchHoraInicio.toLowerCase();
+  filterValues=filterValues.filter(value => value.medioPago?.includes(searchMedioPago));
+  
+  }
+
+
+  }
+  
+   filterValues.forEach(element => {
+     element.medioPago = this.mayusculaPrimerLetra(element.medioPago);
+  });
+
+  return filterValues;
+  }
+
+  
+  mayusculaPrimerLetra(string:String) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  volver(){
+
+    if(this.router.url=="/homeAdministrador/alquilerCancha/nuevo"){ 
+      this.router.navigate(['/homeAdministrador']);
+      }
+      else{
+        this.router.navigate(['/homeInvitado']);
+      }
+  }
+
+  idTransaccionPorIdAlquilerCancha(idAlquilerCancha:number){
+
+    this.tService.mostrarTransaccionesPorIdAlquilerCancha(idAlquilerCancha).subscribe(res=>{
+                
+     this.idTransaccion=res[0].id;
+    });
+  }
 
 }

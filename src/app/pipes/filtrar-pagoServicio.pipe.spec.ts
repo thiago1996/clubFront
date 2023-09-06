@@ -1,4 +1,4 @@
-import { FiltrarPagoServicioPipe } from './filtrar-pagoservicio.pipe';
+import { FiltrarPagoServicioPipe } from './filtrar-pagoServicio.pipe';
 
 describe('FiltrarPagoServicioPipe', () => {
   it('create an instance', () => {

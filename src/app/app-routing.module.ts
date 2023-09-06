@@ -18,25 +18,53 @@ import { BodyPartidoEgresosComponent } from './componentes/body-partidoEgresos/b
 import { BodyBufeComponent } from './componentes/body-bufe/body.bufe.component';
 import { BodyAlquilerBufeComponent } from './componentes/body-alquilerbufe/body.alquilerBufe.component';
 import { BodyCuentaComponent } from './componentes/body-cuenta/body.cuenta.component';
+import { NavMenuAdministradorComponent } from './componentes/navMenuAdministrador/navMenuAdministrador.component';
+import { NavMenuInvitadoComponent } from './componentes/navMenuInvitado/navMenuInvitado.component';
+import { UsuarioComponent } from './componentes/usuario/usuario.component';
+import { LoginComponent } from './componentes/login/login.component';
+import { BodyTransaccionComponent } from './componentes/body-transaccion/body-transaccion.component';
 
 const routes: Routes = [
-  {path : 'socio/nuevo',component:BodySocioComponent},
-  {path : 'jugador/nuevo',component:BodyJugadorComponent},
-  {path : 'entrenador/nuevo',component:BodyEntrenadorComponent},
-  {path : 'categoria/nuevo',component:BodyCategoriaComponent},
-  {path : 'cuota/nuevo',component:BodyCuotaComponent},
-  {path : 'socioCuota/nuevo',component:BodySocioCuotaComponent},
-  {path : 'jugadorCuota/nuevo',component:BodyJugadorCuotaComponent},
-  {path : 'pagoCuotaEntrenador/nuevo',component:BodyPagoCuotaEntrenadorComponent},
-  {path : 'cancha/nuevo',component:BodyCanchaComponent},
-  {path : 'alquilerCancha/nuevo',component:BodyAlquilerCanchaComponent},
-  {path : 'pagoServicio/nuevo',component:BodyPagoServicioComponent},
-  {path : 'partido/nuevo',component:BodyPartidoComponent},
-  {path : 'partidoIngresos/nuevo',component:BodyPartidoIngresosComponent},
-  {path : 'partidoEgresos/nuevo',component:BodyPartidoEgresosComponent},
-  {path : 'bufe/nuevo',component:BodyBufeComponent},
-  {path : 'alquilerBufe/nuevo',component:BodyAlquilerBufeComponent},
-  {path : 'cuenta/nuevo',component:BodyCuentaComponent}
+  {path : '',component:LoginComponent},
+  {path : 'homeAdministrador',component:NavMenuAdministradorComponent},
+  {path : 'homeInvitado',component:NavMenuInvitadoComponent},
+  {path : 'homeAdministrador/socio/nuevo',component:BodySocioComponent},
+  {path : 'homeAdministrador/jugador/nuevo',component:BodyJugadorComponent},
+  {path : 'homeAdministrador/entrenador/nuevo',component:BodyEntrenadorComponent},
+  {path : 'homeAdministrador/categoria/nuevo',component:BodyCategoriaComponent},
+  {path : 'homeAdministrador/cuota/nuevo',component:BodyCuotaComponent},
+  {path : 'homeAdministrador/socioCuota/nuevo',component:BodySocioCuotaComponent},
+  {path : 'homeAdministrador/jugadorCuota/nuevo',component:BodyJugadorCuotaComponent},
+  {path : 'homeAdministrador/pagoCuotaEntrenador/nuevo',component:BodyPagoCuotaEntrenadorComponent},
+  {path : 'homeAdministrador/cancha/nuevo',component:BodyCanchaComponent},
+  {path : 'homeAdministrador/alquilerCancha/nuevo',component:BodyAlquilerCanchaComponent},
+  {path : 'homeAdministrador/pagoServicio/nuevo',component:BodyPagoServicioComponent},
+  {path : 'homeAdministrador/partido/nuevo',component:BodyPartidoComponent},
+  {path : 'homeAdministrador/partidoIngresos/nuevo',component:BodyPartidoIngresosComponent},
+  {path : 'homeAdministrador/partidoEgresos/nuevo',component:BodyPartidoEgresosComponent},
+  {path : 'homeAdministrador/bufe/nuevo',component:BodyBufeComponent},
+  {path : 'homeAdministrador/alquilerBufe/nuevo',component:BodyAlquilerBufeComponent},
+  {path : 'homeAdministrador/cuenta/nuevo',component:BodyCuentaComponent},
+  {path : 'homeAdministrador/usuario/nuevo',component:UsuarioComponent},
+  {path : 'homeAdministrador/transaccion',component:BodyTransaccionComponent},
+  {path : 'homeInvitado/socio/nuevo',component:BodySocioComponent},
+  {path : 'homeInvitado/jugador/nuevo',component:BodyJugadorComponent},
+  {path : 'homeInvitado/entrenador/nuevo',component:BodyEntrenadorComponent},
+  {path : 'homeInvitado/categoria/nuevo',component:BodyCategoriaComponent},
+  {path : 'homeInvitado/cuota/nuevo',component:BodyCuotaComponent},
+  {path : 'homeInvitado/socioCuota/nuevo',component:BodySocioCuotaComponent},
+  {path : 'homeInvitado/jugadorCuota/nuevo',component:BodyJugadorCuotaComponent},
+  {path : 'homeInvitado/pagoCuotaEntrenador/nuevo',component:BodyPagoCuotaEntrenadorComponent},
+  {path : 'homeInvitado/cancha/nuevo',component:BodyCanchaComponent},
+  {path : 'homeInvitado/alquilerCancha/nuevo',component:BodyAlquilerCanchaComponent},
+  {path : 'homeInvitado/pagoServicio/nuevo',component:BodyPagoServicioComponent},
+  {path : 'homeInvitado/partido/nuevo',component:BodyPartidoComponent},
+  {path : 'homeInvitado/partidoIngresos/nuevo',component:BodyPartidoIngresosComponent},
+  {path : 'homeInvitado/partidoEgresos/nuevo',component:BodyPartidoEgresosComponent},
+  {path : 'homeInvitado/bufe/nuevo',component:BodyBufeComponent},
+  {path : 'homeInvitado/alquilerBufe/nuevo',component:BodyAlquilerBufeComponent},
+  {path : 'homeInvitado/transaccion',component:BodyTransaccionComponent}
+  
 ];
 
 @NgModule({

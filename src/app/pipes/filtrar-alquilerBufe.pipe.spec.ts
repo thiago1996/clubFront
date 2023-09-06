@@ -1,4 +1,4 @@
-import { FiltrarAlquilerBufePipe } from './filtrar-alquilerbufe.pipe';
+import { FiltrarAlquilerBufePipe } from './filtrar-alquilerBufe.pipe';
 
 describe('FiltrarAlquilerBufePipe', () => {
   it('create an instance', () => {

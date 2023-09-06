@@ -16,7 +16,7 @@
 </div>
 
  </div>
-
+ <p-button  styleClass="" id="btn_volver" label="Volver" (click)="volver()" styleClass="p-button-raised"></p-button>
 <br>
 <br>
 <div id="listadoBufes" style="display:none;">
@@ -31,7 +31,7 @@
         </thead>
         <tbody>
             <tr *ngFor="let bufe of bufes">
-                <td>{{bufe.numero}}</td>
+                <td>{{bufe.numeroBufe}}</td>
 
                 <td><p-button icon="pi pi-pencil" styleClass="p-button-rounded"
                         (click)="activador(bufe)"></p-button></td>

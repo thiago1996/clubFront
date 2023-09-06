@@ -6,6 +6,11 @@ import { Jugador} from '../../modelo/Jugador';
 import { Cuota } from '../../modelo/Cuota';
 import { JugadorCuota } from 'src/app/modelo/JugadorCuota';
 import Swal from 'sweetalert2';
+import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
+import { Router } from '@angular/router';
+import { TransaccionServicio } from 'src/app/servicio/transaccion.servicio';
+import { Transaccion } from 'src/app/modelo/Transaccion';
+import { JugadorServicio } from 'src/app/servicio/jugador.servicio';
 
 @Component({
   selector: 'app-body-jugadorCuota',
@@ -25,6 +30,7 @@ export class BodyJugadorCuotaComponent {
   id_cuota:any;
   id_cuotaAModificar:any;
   display:boolean=false;
+  cuota:Cuota;
   ids:Array<number>=[];
   filterPropertyName="";
   filterPropertyApellido="";
@@ -48,14 +54,19 @@ export class BodyJugadorCuotaComponent {
   medioPagoModificar:string="default";
   precioAModificar:any;
   medioPagoAModificar:any;
+  generarPdf:boolean=false;
+  idTransaccion:any;
+  cuotaModificar:any;
+  jugadorPorDocumento:Jugador;
 
-constructor(private fb:FormBuilder, private jcService: JugadorCuotaServicio, private cService: CuentaServicio){
+constructor(private fb:FormBuilder, private jcService: JugadorCuotaServicio, private cService: CuentaServicio, private jService:JugadorServicio, private rService:ReporteServicio, private tService:TransaccionServicio, private router:Router){
 
   //this.display=false;
     this.jugadores=[];
     this.jugadoresCuotas=[];
     this.mostrarJugadores();
-  
+    this.cuota = new Cuota();
+    this.jugadorPorDocumento = new Jugador();
     this.mes=0;
     
   //  this.cuotaPorParametros = new Cuota();
@@ -204,6 +215,9 @@ console.log("err  "+control);
 
   nombre=jugador.nombre?.trim();
   apellido=jugador.apellido?.trim();
+  
+  let transaccion:Transaccion;
+  transaccion = new Transaccion();
 
  this.jcService.crearJugadorCuota(this.id_cuota, this.documento, nombre, apellido, precio, this.medioPago, fecha).subscribe(res =>{
 
@@ -226,6 +240,18 @@ console.log("err  "+control);
 
     });
    }
+
+   transaccion.descripcion = this.documento+" "+nombre+" "+apellido+ " "+this.mes+"/"+anio;
+   transaccion.fecha=fecha;
+   transaccion.importe=precio;
+   transaccion.medioPago=this.medioPago;
+   transaccion.tipo="Ingreso";
+   transaccion.jugador=jugador;
+   transaccion.cuota=this.cuota;
+  
+   this.tService.crearTransaccion(transaccion).subscribe(res =>{
+
+   })
 
 });
 
@@ -268,7 +294,7 @@ activador(jugadorCuota: JugadorCuota){
   this.documentoJugadorAModificar=this.ids[1];
   this.precioAModificar = jugadorCuota.precio;
   this.medioPagoAModificar = jugadorCuota.medioPago;
-
+  this.cuotaModificar=jugadorCuota.cuota;
   this.display= !this.display;
  
 }
@@ -288,7 +314,7 @@ mostrarCuotaPorParametros(año:number, mes:number){
   this.jcService.mostrarCuotaPorParametros(año, mes).subscribe(res =>{
     if(res!=null){ 
       this.id_cuota=res.id_cuota;
-      console.log(this.id_cuota);
+      this.cuota=res;
        }
        else{
         this.id_cuota=undefined;
@@ -339,10 +365,17 @@ modificarJugadorCuota(){
     let precio:number;
     let fechaPago:String;
     let control = false;
+    let transaccion:Transaccion;
+    
+    transaccion = new Transaccion();
 
+    this.buscarJugadorPorDocumento(this.documentoJugadorAModificar);
+    
     precio = this.formularioModificarJugadorCuota.get('precio')?.value;
     fechaPago = this.formularioModificarJugadorCuota.get('fechaPago')?.value;
     this.medioPagoModificar = this.formularioModificarJugadorCuota.get('medioPagoModificar')?.value;
+
+    this.idTransaccionPorDocumentoJugadorIdCuota(this.documentoJugadorAModificar, this.id_cuotaAModificar);   
   
     this.jcService.crearJugadorCuota(this.id_cuotaAModificar, this.documentoJugadorAModificar, this.nombreJugadorAModificar, this.apellidoJugadorAModificar, precio, this.medioPagoModificar, fechaPago).subscribe(res =>{
       this.display = !this.display;
@@ -424,6 +457,20 @@ modificarJugadorCuota(){
             }
         }
       }
+
+      transaccion.tipo="Ingreso";
+      transaccion.id=this.idTransaccion;
+      transaccion.cuota=this.cuotaModificar;
+      transaccion.jugador=this.jugadorPorDocumento;
+      transaccion.medioPago=this.medioPagoModificar;
+      transaccion.importe=precio;
+      transaccion.fecha=fechaPago;
+      transaccion.descripcion=this.documentoJugadorAModificar+" "+this.nombreJugadorAModificar+" "+this.apellidoJugadorAModificar+" "+transaccion.cuota?.mes+"/"+transaccion.cuota?.anio;
+      
+     
+      this.tService.crearTransaccion(transaccion).subscribe(res=>{
+  
+      });
   
     });
    
@@ -449,6 +496,7 @@ mostrarTabla(){
 
   let tabla = document.getElementById('listadoPagosCuotasJugadores')
   if(tabla)  tabla.style.display = "block"; 
+  this.generarPdf=true;
 },1000);
 }
 
@@ -478,8 +526,21 @@ eliminarJugadorCuota(jugadorCuota:JugadorCuota){
      this.cService.egresoDebito(importe).subscribe(res => {
      });
    }
+   
+   console.log(documentoJugador);
+   console.log(id_cuota);
+
+   this.idTransaccionPorDocumentoJugadorIdCuota(documentoJugador, id_cuota);
+   
+   setTimeout(() => {
+     console.log(this.idTransaccion);
+    this.tService.eliminarTransaccion(this.idTransaccion).subscribe(res => {
+    });
+
+   }, 300);
 
     });
+
     }
 
     onSearchJugadorName(searchName:string){
@@ -511,5 +572,155 @@ eliminarJugadorCuota(jugadorCuota:JugadorCuota){
     cerrar(){
       this.display = !this.display;
     }
+
+    imprimir(){
+
+      const encabezado = ["Documento", "Nombre", "Año", "Mes", "Precio", "Medio", "Fecha de pago"];
+    
+      let jugadorCuotaFiltrado: Array<JugadorCuota>;
+      jugadorCuotaFiltrado = new Array<JugadorCuota>();
+     
+      jugadorCuotaFiltrado= this.filtroJugadorCuota(this.jugadoresCuotas, this.searchName, this.searchApellido, this.searchDocumento, this.searchAnio, this.searchMes, this.searchMedioPago);
+    
+     const cuerpo =  jugadorCuotaFiltrado.map(
+    
+      (obj : JugadorCuota) => {
+        const datos = [
+          obj.documento,
+          obj.nombre + " " + obj.apellido,
+          obj.anioCuota,
+          obj.mesCuota,
+          obj.precio,
+          obj.medioPago,
+          obj.fechaPago
+        ]
+        return datos;
+      }
+     )
+    
+    this.rService.imprimir(encabezado, cuerpo, "Listado de pago de cuotas de jugadores", true);
+    
+    }
+    
+    filtroJugadorCuota(values: JugadorCuota[], searchName: string, searchApellido:string,searchDocumento: string, searchAnio:string, searchMes:string, searchMedioPago:string): any[] {
+
+      let filterValues=values;
+
+
+      if(values.length>0){
+      
+        if(searchName!=""){ 
+          console.log(searchName);
+        values.forEach(value =>
+          {
+        let nombre:any=value.nombre;
+        value.nombre= nombre.toLowerCase();
+      
+    }
+        );
+        searchName=searchName.toLowerCase();
+        filterValues= filterValues.filter(value => value.nombre?.includes(searchName));
+      }
+        
+        if(searchApellido!=""){
+          console.log(searchApellido);
+          values.forEach(value =>
+            {
+          let apellido:any=value.apellido;
+          value.apellido= apellido.toLowerCase();
+      }
+          );
+        searchApellido=searchApellido.toLowerCase();
+        filterValues=filterValues.filter(value => value.apellido?.includes(searchApellido));
+        
+        }
+     
+      if(searchDocumento!=""){ 
+       
+        console.log(searchDocumento);
+        filterValues= filterValues.filter(value => value.documento?.toString().includes(searchDocumento));
+      }
+    
+      if(searchAnio!=""){
+        console.log(searchAnio);
+        values.forEach(value =>
+          {
+        let anio:any=value.anioCuota;
+        value.anioCuota= anio.toLowerCase();
+    }
+        );
+      searchAnio=searchAnio.toLowerCase();
+      filterValues=filterValues.filter(value => value.anioCuota?.includes(searchAnio));
+      
+      }
+    
+      if(searchMes!=""){
+        console.log(searchMes);
+        values.forEach(value =>
+          {
+        let mes:any=value.mesCuota;
+        value.mesCuota= mes.toLowerCase();
+    }
+        );
+      searchMes=searchMes.toLowerCase();
+      filterValues=filterValues.filter(value => value.mesCuota?.includes(searchMes));
+      
+      }
+    
+      if(searchMedioPago!=""){
+        console.log("xxx");
+        console.log(searchMedioPago);
+        values.forEach(value =>
+          {
+        let medioPago:any=value.medioPago;
+        value.medioPago= medioPago.toLowerCase();
+    }
+        );
+      searchMedioPago=searchMedioPago.toLowerCase();
+      filterValues=filterValues.filter(value => value.medioPago?.includes(searchMedioPago));
+      
+      }
+    
+      }
+    
+      filterValues.forEach(element => {
+        element.nombre = this.mayusculaPrimerLetra(element.nombre);
+        element.apellido = this.mayusculaPrimerLetra(element.apellido);
+        element.medioPago = this.mayusculaPrimerLetra(element.medioPago);
+     });
+    
+      return filterValues;
+      }
+    
+      mayusculaPrimerLetra(string:String) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+
+      volver(){
+
+        if(this.router.url=="/homeAdministrador/jugadorCuota/nuevo"){ 
+          this.router.navigate(['/homeAdministrador']);
+          }
+          else{
+            this.router.navigate(['/homeInvitado']);
+          }
+      }
+
+      idTransaccionPorDocumentoJugadorIdCuota(documento:number,idCuota:number){
+
+        this.tService.mostrarTransaccionesPorJugadorYCuota(documento, idCuota).subscribe(res=>{
+                    
+         this.idTransaccion=res[0].id;
+        });
+      }
+
+      buscarJugadorPorDocumento(documento:number)
+      {
+
+       this.jService.obtenerJugadorPorDocumento(documento).subscribe(res=>{
+                    
+        this.jugadorPorDocumento=res;
+       });
+}
 
 }

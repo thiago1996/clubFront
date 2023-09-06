@@ -41,6 +41,10 @@ modificarJugador(jugador: Jugador){
 buscarJugadorPorDocumento(documento:number){
   return this.http.get<Boolean>(this.rutaglobal + 'buscarPorDocumento/'+documento);
 }
+
+obtenerJugadorPorDocumento(documento:number){
+  return this.http.get<Jugador>(this.rutaglobal + 'obtenerPorDocumento/'+documento);
+}
    //Eliminar jugador
    eliminarJugador(documento: number){
 

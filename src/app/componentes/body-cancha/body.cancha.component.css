@@ -26,4 +26,8 @@ tr, td{
 
   margin-left: 60px;
  }
+
+ #btn_volver{
+    margin-left: 90%;
+   }
 } 

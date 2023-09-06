@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, NonNullableFormBuilder, FormControl } from '@angular/forms';
-import { JugadorCuota } from 'src/app/modelo/JugadorCuota';
+import { Router } from '@angular/router';
 import { Partido } from 'src/app/modelo/Partido';
+import { Transaccion } from 'src/app/modelo/Transaccion';
 import { CuentaServicio } from 'src/app/servicio/cuenta.servicio';
 import { PartidoServicio } from 'src/app/servicio/partido.servicio';
 import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
+import { TransaccionServicio } from 'src/app/servicio/transaccion.servicio';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -32,15 +34,20 @@ export class BodyPartidoIngresosComponent {
   partido:Partido;
   ingresoEntradasAModificar:any;
   generarPdf:boolean=false;
+  idTransaccion:any;
+
+  transaccionPorPartido:Transaccion;
 
   partidos: Array<Partido>;
 
-  constructor(private fb:FormBuilder, private pService: PartidoServicio, private cService: CuentaServicio, private rService:ReporteServicio){
+  constructor(private fb:FormBuilder, private pService: PartidoServicio, private cService: CuentaServicio, private rService:ReporteServicio, private tService:TransaccionServicio, private router:Router){
   
     this.partidos= new Array<Partido>();
     this.display = false;
     this.partido = new Partido();
+    this.transaccionPorPartido= new Transaccion();
     this.mostrarTabla();
+
 
     this.formularioIngresosPartido = fb.group({
 
@@ -63,6 +70,8 @@ export class BodyPartidoIngresosComponent {
 
     let ingresoEntradas:any;
     ingresoEntradas = this.formularioIngresosPartido.get('ingresoEntradas')?.value;
+    let transaccion:Transaccion;
+    transaccion = new Transaccion();
 
 if(!isNaN(ingresoEntradas)){
 
@@ -80,6 +89,7 @@ if(!isNaN(ingresoEntradas)){
   else{
 
     this.partido.ingresoEntradas = this.formularioIngresosPartido.get('ingresoEntradas')?.value;
+    this.idTransaccionPorPartidoYTipo(this.partido, "Ingreso");
 
     this.pService.modificarPartido(this.partido).subscribe(res =>{
             
@@ -105,6 +115,23 @@ if(!isNaN(ingresoEntradas)){
               
       });
     }, 500);
+
+    
+   if(this.idTransaccion!=0){
+
+    transaccion.id = this.idTransaccion;
+   }
+
+    transaccion.tipo="Ingreso";
+    transaccion.partido=this.partido;
+    transaccion.fecha=this.partido.fecha;
+    transaccion.medioPago="Efectivo";
+    transaccion.importe=ingresoEntradas;
+    transaccion.descripcion=this.partido.descripcion +" "+this.partido.categoria.nombre+" "+this.partido.categoria.deporte;
+
+this.tService.crearTransaccion(transaccion).subscribe(res=>{
+              
+});
 
     });
 
@@ -318,6 +345,24 @@ return filterValues;
 
 mayusculaPrimerLetra(string:String) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+volver(){
+
+  if(this.router.url=="/homeAdministrador/partidoIngresos/nuevo"){ 
+    this.router.navigate(['/homeAdministrador']);
+    }
+    else{
+      this.router.navigate(['/homeInvitado']);
+    }
+}
+
+idTransaccionPorPartidoYTipo(partido:Partido, tipo:String){
+
+  this.tService.mostrarTransaccionesPorPartidoYTipo(partido, tipo).subscribe(res=>{
+            
+   this.idTransaccion=res[0].id;
+  });
 }
 
 }

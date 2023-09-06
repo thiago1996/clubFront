@@ -7,9 +7,10 @@ export class Partido {
     cancha!:string;
     fecha!:string;
     ingresoEntradas?:number;
-    gastoSeguridad?:number;
-    gastoMedicos?:number;
-    gastoArbitros?:number;
-    gastoExtra?:number;
+    gastoSeguridad!:number;
+    gastoMedicos!:number;
+    gastoArbitros!:number;
+    gastoExtra!:number;
+    gastoTotal?:number;
     observaciones?:string;
 }

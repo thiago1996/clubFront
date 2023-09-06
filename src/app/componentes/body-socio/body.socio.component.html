@@ -1,4 +1,5 @@
 <h2> &nbsp; &nbsp; &nbsp; Registro de Socios</h2>
+
 <div class="container-formulario">
 <div>
 <form action="" [formGroup]="formularioSocio">
@@ -79,7 +80,11 @@
 &nbsp; &nbsp; &nbsp; &nbsp;<p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
 </div>   
 </div>
+
 </div>
+
+<p-button  styleClass="" id="btn_volver" label="Volver" (click)="volver()" styleClass="p-button-raised"></p-button>
+
     <!--[(ngModel)]="fechaNacimiento"   ....  Si necesito usar la fecha en el ts-->
    
     <!--<div class="p-inputgroup p-m-2">

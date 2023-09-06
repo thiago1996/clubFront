@@ -6,6 +6,11 @@ import { Socio } from '../../modelo/Socio';
 import { Cuota } from '../../modelo/Cuota';
 import { SocioCuota } from 'src/app/modelo/SocioCuota';
 import Swal from 'sweetalert2';
+import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
+import { Router } from '@angular/router';
+import { TransaccionServicio } from 'src/app/servicio/transaccion.servicio';
+import { Transaccion } from 'src/app/modelo/Transaccion';
+import { SocioServicio } from 'src/app/servicio/socio.service';
 
 
 @Component({
@@ -32,6 +37,7 @@ export class BodySocioCuotaComponent {
   documento:any;
   id_cuotaAModificar:any;
   display:boolean=false;
+  cuota:Cuota;
   ids:Array<number>=[];
   filterPropertyName="";
   filterPropertyApellido="";
@@ -49,9 +55,13 @@ export class BodySocioCuotaComponent {
   medioPagoModificar:string="default";
   precioAModificar:any;
   medioPagoAModificar:any;
+  generarPdf:boolean=false;
+  idTransaccion:any;
+  cuotaModificar:any;
+  socioPorDocumento:Socio;
 
 
-constructor(private fb:FormBuilder, private scService: SocioCuotaServicio, private cService: CuentaServicio){
+constructor(private fb:FormBuilder, private scService: SocioCuotaServicio, private sService: SocioServicio, private cService: CuentaServicio, private rService:ReporteServicio, private tService:TransaccionServicio, private router:Router){
 
   //this.display=false;
     this.socios=[];
@@ -59,7 +69,8 @@ constructor(private fb:FormBuilder, private scService: SocioCuotaServicio, priva
     this.mostrarSocios();
     this.mes=0;
     this.cuotaPorParametros = new Cuota();
-   
+    this.cuota=new Cuota();
+    this.socioPorDocumento = new Socio();
 
  
   this.formularioSocioCuota = fb.group({
@@ -197,12 +208,12 @@ if(this.formularioSocioCuota.valid){
 
 
   fecha=fechaPago.getFullYear()+'-'+mesFecha+'-'+diaFecha;
-  console.log(socio);
+ 
   nombre=socio.nombre?.trim();
   apellido=socio.apellido?.trim();
 
-  console.log(nombre);
-  console.log(apellido);
+  let transaccion:Transaccion;
+  transaccion = new Transaccion();
 
   this.scService.crearSocioCuota(this.id_cuota, this.documento, nombre, apellido, precio, this.medioPago, fecha).subscribe(res =>{
 
@@ -226,6 +237,18 @@ if(this.formularioSocioCuota.valid){
       });
      }
     this.mostrarSociosCuotas();
+
+    transaccion.descripcion = this.documento+" "+nombre+" "+apellido+ " "+this.mes+"/"+anio;
+    transaccion.fecha=fecha;
+    transaccion.importe=precio;
+    transaccion.medioPago=this.medioPago;
+    transaccion.tipo="Ingreso";
+    transaccion.socio=socio;
+    transaccion.cuota=this.cuota;
+   
+    this.tService.crearTransaccion(transaccion).subscribe(res =>{
+ 
+    })
     
   });
 
@@ -265,7 +288,7 @@ activador(socioCuota: SocioCuota){
   this.documentoSocioAModificar=this.ids[1];
   this.precioAModificar = socioCuota.precio;
   this.medioPagoAModificar = socioCuota.medioPago;
-
+  this.cuotaModificar=socioCuota.cuota;
 
   this.display= !this.display;
  
@@ -323,15 +346,17 @@ modificarSocioCuota(){
 
     let precio:number;
     let fechaPago:String;
-    //let medio:String;
- 
-    //let nombre:any;
-    //let apellido:any;
+    let transaccion:Transaccion;
+    transaccion = new Transaccion();
     let control = false;
    
+this.buscarSocioPorDocumento(this.documentoSocioAModificar);
+
     precio = this.formularioModificarSocioCuota.get('precio')?.value;
     fechaPago = this.formularioModificarSocioCuota.get('fechaPago')?.value;
     this.medioPagoModificar = this.formularioModificarSocioCuota.get('medioPagoModificar')?.value;
+
+    this.idTransaccionPorDocumentoSocioIdCuota(this.documentoSocioAModificar, this.id_cuotaAModificar); 
 
     this.scService.crearSocioCuota(this.id_cuotaAModificar, this.documentoSocioAModificar, this.nombreSocioAModificar, this.apellidoSocioAModificar, precio, this.medioPagoModificar, fechaPago).subscribe(res =>{
         this.display = !this.display;
@@ -409,6 +434,23 @@ modificarSocioCuota(){
       }
       
     });
+    
+      setTimeout(() => {
+        
+      
+      transaccion.tipo="Ingreso";
+      transaccion.id=this.idTransaccion;
+      transaccion.cuota=this.cuotaModificar;
+      transaccion.socio=this.socioPorDocumento;
+      transaccion.medioPago=this.medioPagoModificar;
+      transaccion.importe=precio;
+      transaccion.fecha=fechaPago;
+      transaccion.descripcion=this.documentoSocioAModificar+" "+this.nombreSocioAModificar+" "+this.apellidoSocioAModificar+" "+transaccion.cuota?.mes+"/"+transaccion.cuota?.anio;
+
+      this.tService.crearTransaccion(transaccion).subscribe(res=>{
+  
+      });
+    }, 300);
   
 setTimeout(() => {
 
@@ -432,7 +474,7 @@ mostrarCuotaPorParametros(año:number, mes:number){
   this.scService.mostrarCuotaPorParametros(año, mes).subscribe(res =>{
     if(res!=null){ 
       this.id_cuota=res.id_cuota;
-      console.log(this.id_cuota);
+      this.cuota=res;
        }
        else{
         this.id_cuota=undefined;
@@ -446,6 +488,7 @@ mostrarTabla(){
 
   let tabla = document.getElementById('listadoPagosCuotasSocios')
   if(tabla)  tabla.style.display = "block"; 
+  this.generarPdf=true;
 },1000);
 }
 
@@ -474,6 +517,15 @@ eliminarSocioCuota(socioCuota:SocioCuota){
       this.cService.egresoDebito(importe).subscribe(res => {
       });
     }
+
+    this.idTransaccionPorDocumentoSocioIdCuota(documentoSocio, id_cuota);
+   
+   setTimeout(() => {
+     console.log(this.idTransaccion);
+    this.tService.eliminarTransaccion(this.idTransaccion).subscribe(res => {
+    });
+
+   }, 300);
    
     });
     }
@@ -508,4 +560,155 @@ eliminarSocioCuota(socioCuota:SocioCuota){
       this.display = !this.display;
     }
 
+    imprimir(){
+
+      const encabezado = ["Documento", "Nombre", "Año", "Mes", "Precio", "Medio", "Fecha de pago"];
+    
+      let socioCuotaFiltrado: Array<SocioCuota>;
+      socioCuotaFiltrado = new Array<SocioCuota>();
+     
+      socioCuotaFiltrado= this.filtroSocioCuota(this.sociosCuotas, this.searchName, this.searchApellido, this.searchDocumento, this.searchAnio, this.searchMes, this.searchMedioPago);
+    
+     const cuerpo =  socioCuotaFiltrado.map(
+    
+      (obj : SocioCuota) => {
+        const datos = [
+          obj.documento,
+          obj.nombre + " " + obj.apellido,
+          obj.anioCuota,
+          obj.mesCuota,
+          obj.precio,
+          obj.medioPago,
+          obj.fechaPago
+        ]
+        return datos;
+      }
+     )
+    
+    this.rService.imprimir(encabezado, cuerpo, "Listado de pago de cuotas de socios", true);
+    
+    }
+    
+    filtroSocioCuota(values: SocioCuota[], searchName: string, searchApellido:string,searchDocumento: string, searchAnio:string, searchMes:string, searchMedioPago:string): any[] {
+
+      let filterValues=values;
+
+
+      if(values.length>0){
+      
+        if(searchName!=""){ 
+          console.log(searchName);
+        values.forEach(value =>
+          {
+        let nombre:any=value.nombre;
+        value.nombre= nombre.toLowerCase();
+      
+    }
+        );
+        searchName=searchName.toLowerCase();
+        filterValues= filterValues.filter(value => value.nombre?.includes(searchName));
+      }
+        
+        if(searchApellido!=""){
+          console.log(searchApellido);
+          values.forEach(value =>
+            {
+          let apellido:any=value.apellido;
+          value.apellido= apellido.toLowerCase();
+      }
+          );
+        searchApellido=searchApellido.toLowerCase();
+        filterValues=filterValues.filter(value => value.apellido?.includes(searchApellido));
+        
+        }
+     
+      if(searchDocumento!=""){ 
+       
+        console.log(searchDocumento);
+        filterValues= filterValues.filter(value => value.documento?.toString().includes(searchDocumento));
+      }
+    
+      if(searchAnio!=""){
+        console.log(searchAnio);
+        values.forEach(value =>
+          {
+        let anio:any=value.anioCuota;
+        value.anioCuota= anio.toLowerCase();
+    }
+        );
+      searchAnio=searchAnio.toLowerCase();
+      filterValues=filterValues.filter(value => value.anioCuota?.includes(searchAnio));
+      
+      }
+    
+      if(searchMes!=""){
+        console.log(searchMes);
+        values.forEach(value =>
+          {
+        let mes:any=value.mesCuota;
+        value.mesCuota= mes.toLowerCase();
+    }
+        );
+      searchMes=searchMes.toLowerCase();
+      filterValues=filterValues.filter(value => value.mesCuota?.includes(searchMes));
+      
+      }
+    
+      if(searchMedioPago!=""){
+        console.log("xxx");
+        console.log(searchMedioPago);
+        values.forEach(value =>
+          {
+        let medioPago:any=value.medioPago;
+        value.medioPago= medioPago.toLowerCase();
+    }
+        );
+      searchMedioPago=searchMedioPago.toLowerCase();
+      filterValues=filterValues.filter(value => value.medioPago?.includes(searchMedioPago));
+      
+      }
+    
+      }
+    
+      filterValues.forEach(element => {
+        element.nombre = this.mayusculaPrimerLetra(element.nombre);
+        element.apellido = this.mayusculaPrimerLetra(element.apellido);
+        element.medioPago = this.mayusculaPrimerLetra(element.medioPago);
+     });
+    
+      return filterValues;
+      }
+    
+      mayusculaPrimerLetra(string:String) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+
+      volver(){
+
+        if(this.router.url=="/homeAdministrador/socioCuota/nuevo"){ 
+          this.router.navigate(['/homeAdministrador']);
+          }
+          else{
+            this.router.navigate(['/homeInvitado']);
+          }
+      }
+
+      idTransaccionPorDocumentoSocioIdCuota(documento:number,idCuota:number){
+
+        this.tService.mostrarTransaccionesPorSocioYCuota(documento, idCuota).subscribe(res=>{
+                    
+         this.idTransaccion=res[0].id;
+        });
+      }
+
+      buscarSocioPorDocumento(documento:number)
+      {
+
+       this.sService.obtenerSocioPorDocumento(documento).subscribe(res=>{
+      
+        this.socioPorDocumento=res;
+   
+       });
+}
+    
 }

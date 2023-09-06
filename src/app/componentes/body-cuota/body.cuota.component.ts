@@ -1,6 +1,7 @@
 import { NONE_TYPE } from '@angular/compiler';
 import { Component, ɵsetAllowDuplicateNgModuleIdsForTest } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, NonNullableFormBuilder, FormControl } from '@angular/forms';
+import { Route, Router } from '@angular/router';
 import { isEmpty } from 'rxjs';
 import { Cuota } from 'src/app/modelo/Cuota';
 import { CuotaServicio } from 'src/app/servicio/cuota.servicio';
@@ -30,7 +31,7 @@ export class BodyCuotaComponent {
   generarPdf:boolean=false;
   
   
-constructor(private fb:FormBuilder, private cService: CuotaServicio, private rService:ReporteServicio){
+constructor(private fb:FormBuilder, private cService: CuotaServicio, private rService:ReporteServicio, private router:Router){
 
   this.cuotas= new Array<Cuota>();
   this.cuotaPorParametros = new Cuota();
@@ -414,5 +415,14 @@ filtroCuotas(values: Cuota[], searchAnio: number, searchMes:number) {
   return values;
 }
 
+volver(){
+
+  if(this.router.url=="/homeAdministrador/cuota/nuevo"){ 
+    this.router.navigate(['/homeAdministrador']);
+    }
+    else{
+      this.router.navigate(['/homeInvitado']);
+    }
+}
 }
 

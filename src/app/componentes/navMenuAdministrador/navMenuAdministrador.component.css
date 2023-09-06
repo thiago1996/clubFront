@@ -1,0 +1,9 @@
+::ng-deep .menu {
+    background-color: #CACFD2;
+    color-scheme: light;
+}
+
+::ng-deep .crear{
+
+    margin-right: 10px;
+}

@@ -6,13 +6,14 @@ import { Partido } from '../modelo/Partido';
 })
 export class FiltrarPartidoPipe implements PipeTransform {
 
-  transform(values: Partido[], searchDescripcion: string, searchCancha:string,searchCategoria: string, searchTipoCategoria:string, searchDeporte:string, searchFecha:string): any[] {
+  transform(values: any[], searchDescripcion: string, searchCancha:string,searchCategoria: string, searchTipoCategoria:string, searchDeporte:string, searchFecha:string): any[] {
 
     let filterValues=values;
 
   if(values.length>0){
   
     if(searchDescripcion!=""){ 
+
     values.forEach(value =>
       {
     let descripcion:any=value.descripcion;
@@ -39,12 +40,19 @@ export class FiltrarPartidoPipe implements PipeTransform {
 }
    
     if(searchCategoria!=""){
+
+      if(values[0].categoria != null) {
      
     filterValues=filterValues.filter(value => value.categoria.nombre.toString().includes(searchCategoria));
-  
+      }
+      else{
+        filterValues=filterValues.filter(value => value.nombreCategoria.toString().includes(searchCategoria));
+      }
   }
 
   if(searchTipoCategoria!=""){
+
+    if(values[0].categoria != null) {
 
     values.forEach(value =>
       {
@@ -54,11 +62,23 @@ export class FiltrarPartidoPipe implements PipeTransform {
     );
   searchTipoCategoria=searchTipoCategoria.toLowerCase();
   filterValues=filterValues.filter(value => value.categoria?.tipo.includes(searchTipoCategoria));
-
+    }
+    else{
+      values.forEach(value =>
+        {
+      let tipoCategoria:any=value.tipoCategoria;
+      value.tipoCategoria= tipoCategoria.toLowerCase();
+  }
+      );
+    searchTipoCategoria=searchTipoCategoria.toLowerCase();
+    filterValues=filterValues.filter(value => value.tipoCategoria.includes(searchTipoCategoria));
+    }
 }
 
 if(searchDeporte!=""){ 
   
+  if(values[0].categoria !=null){
+
   values.forEach(value =>
     {
   let deporte:any=value.categoria.deporte;
@@ -68,6 +88,19 @@ if(searchDeporte!=""){
   );
   searchDeporte=searchDeporte.toLowerCase();
   filterValues= filterValues.filter(value => value.categoria.deporte?.includes(searchDeporte));
+
+}
+else{
+  values.forEach(value =>
+    {
+  let deporte:any=value.deporte;
+  value.deporte = deporte.toLowerCase();
+
+}
+  );
+  searchDeporte=searchDeporte.toLowerCase();
+  filterValues= filterValues.filter(value => value.deporte?.includes(searchDeporte));
+}
 }
  
 if(searchFecha!=""){ 
@@ -86,12 +119,23 @@ if(searchFecha!=""){
 }
 
 filterValues.forEach(element => {
+
   element.descripcion = this.mayusculaPrimerLetra(element.descripcion);
   element.cancha = this.mayusculaPrimerLetra(element.cancha);
-  //element.categoria.nombre = this.mayusculaPrimerLetra(element.categoria.nombre);
-  element.categoria.tipo = this.mayusculaPrimerLetra(element.categoria.tipo);
-  element.categoria.deporte = this.mayusculaPrimerLetra(element.categoria.deporte);
   element.fecha = this.mayusculaPrimerLetra(element.fecha);
+ 
+  if(values[0].categoria!=null){
+    console.log("Hola");
+    element.tipoCategoria = this.mayusculaPrimerLetra(element.categoria.tipo);
+    element.deporte = this.mayusculaPrimerLetra(element.categoria.deporte);
+  }
+  else{
+    console.log("chau!");
+    element.tipoCategoria = this.mayusculaPrimerLetra(element.tipoCategoria);
+    element.deporte = this.mayusculaPrimerLetra(element.deporte);
+  }
+  
+  
 });
 
 return filterValues;

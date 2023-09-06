@@ -29,6 +29,11 @@ mostrarEntrenadores(){
 buscarEntrenadorPorDocumento(documento:number){
   return this.http.get<Boolean>(this.rutaglobal + 'buscarPorDocumento/'+documento);
 }
+
+obtenerEntrenadorPorDocumento(documento:number){
+  return this.http.get<Entrenador>(this.rutaglobal + 'obtenerPorDocumento/'+documento);
+}
+
    //Actualizar entrenador
 modificarEntrenador(entrenador: Entrenador){
 

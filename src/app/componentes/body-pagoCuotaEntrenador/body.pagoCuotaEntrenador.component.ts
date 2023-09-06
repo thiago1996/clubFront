@@ -6,6 +6,11 @@ import { Entrenador} from '../../modelo/Entrenador';
 import { PagoCuotaEntrenador} from '../../modelo/PagoCuotaEntrenador';
 import { Cuota } from '../../modelo/Cuota';
 import Swal from 'sweetalert2';
+import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
+import { Router } from '@angular/router';
+import { TransaccionServicio } from 'src/app/servicio/transaccion.servicio';
+import { Transaccion } from 'src/app/modelo/Transaccion';
+import { EntrenadorServicio } from 'src/app/servicio/entrenador.servicio';
 
 @Component({
   selector: 'app-body-pagoCuotaEntrenador',
@@ -48,14 +53,18 @@ export class BodyPagoCuotaEntrenadorComponent {
   medioPagoModificar:string="default";
   importeAModificar:any;
   medioPagoAModificar:any;
+  generarPdf:boolean=false;
+  cuota:Cuota;
+  cuotaModificar:any;
+  idTransaccion:any
 
-constructor(private fb:FormBuilder, private pceService: PagoCuotaEntrenadorServicio, private cService: CuentaServicio){
+constructor(private fb:FormBuilder, private pceService: PagoCuotaEntrenadorServicio, private cService: CuentaServicio, private eService:EntrenadorServicio, private rService:ReporteServicio, private tService:TransaccionServicio, private router:Router){
 
   //this.display=false;
     this.entrenadores=[];
     this.entrenadoresCuotas=[];
     this.mostrarEntrenadores();
-  
+    this.cuota= new Cuota();
     this.mes=0;
    // this.id_cuota=0;
     //this.cuotaPorParametros = new Cuota();
@@ -101,7 +110,9 @@ if(this.formularioEntrenadorCuota.valid){
   let nombre:any;
   let apellido:any;
   let entrenador:Entrenador;
-  
+  let transaccion:Transaccion;
+  transaccion = new Transaccion();
+
   entrenador = new Entrenador();
 
   anio = this.formularioEntrenadorCuota.get('anio')?.value;
@@ -232,6 +243,19 @@ apellido=entrenador.apellido?.trim();
     });
    }
 
+   transaccion.tipo="Egreso";
+   transaccion.cuota=this.cuota;
+   transaccion.fecha=fecha;
+   transaccion.medioPago=this.medioPago;
+   transaccion.importe=importe;
+   transaccion.entrenador=entrenador;
+   transaccion.descripcion=entrenador.nombre+" "+entrenador.apellido+" "+this.cuota.mes+"/"+this.cuota.anio;
+
+   console.log(transaccion);
+this.tService.crearTransaccion(transaccion).subscribe(res=>{
+             
+});
+
   });
 //},500);
 
@@ -265,7 +289,7 @@ activador(entrenadorCuota: PagoCuotaEntrenador){
   this.documentoEntrenadorAModificar=this.ids[1];
   this.importeAModificar = entrenadorCuota.importe;
   this.medioPagoAModificar = entrenadorCuota.medioPago;
-
+  this.cuotaModificar=entrenadorCuota.cuota
 
   this.display= !this.display;
  
@@ -286,7 +310,7 @@ mostrarCuotaPorParametros(año:number, mes:number){
    // this.cuotaPorParametros = res;
    if(res!=null){ 
   this.id_cuota=res.id_cuota;
-  console.log(this.id_cuota);
+  this.cuota = res;
    }
    else{
     this.id_cuota=undefined;
@@ -340,11 +364,16 @@ modificarEntrenadorCuota(){
     let importe:number;
     let fechaPago:String;
     let control = false;
+    let transaccion:Transaccion;
+    let entrenador:Entrenador;
 
+    entrenador = new Entrenador();
+    transaccion = new Transaccion();
     importe = this.formularioModificarEntrenadorCuota.get('importe')?.value;
     fechaPago = this.formularioModificarEntrenadorCuota.get('fechaPago')?.value;
     this.medioPagoModificar = this.formularioModificarEntrenadorCuota.get('medioPagoModificar')?.value;
 
+    this.idTransaccionPorIdPagoCuotaEntrenador(this.documentoEntrenadorAModificar, this.id_cuotaAModificar);  
 
     this.pceService.crearPagoCuotaEntrenador(this.id_cuotaAModificar, this.documentoEntrenadorAModificar, this.nombreEntrenadorAModificar, this.apellidoEntrenadorAModificar, importe, this.medioPagoModificar,fechaPago).subscribe(res =>{
       this.display = !this.display;
@@ -423,8 +452,36 @@ modificarEntrenadorCuota(){
         }
       }
 
+      this.eService.obtenerEntrenadorPorDocumento(this.documentoEntrenadorAModificar).subscribe(res=> {  
+      entrenador = res;
+      })   
+
+      setTimeout(() => {
+        
+
+        if(this.idTransaccion!=0){
+
+          transaccion.id = this.idTransaccion;
+         }
+
+      transaccion.id=this.idTransaccion;
+      transaccion.tipo="Egreso";
+      transaccion.cuota=this.cuotaModificar;
+      transaccion.fecha=fechaPago;
+      transaccion.medioPago=this.medioPagoModificar;
+      transaccion.importe=importe;
+      transaccion.entrenador=entrenador;
+      transaccion.descripcion=entrenador.documento+" "+entrenador.nombre+" "+entrenador.apellido+" "+this.cuotaModificar.mes+"/"+this.cuotaModificar.anio;
+   
       this.formularioModificarEntrenadorCuota.reset();
-      
+
+      console.log(transaccion);
+   this.tService.crearTransaccion(transaccion).subscribe(res=>{
+                
+   });
+
+  }, 300);
+
     });
     
     setTimeout(() => {
@@ -451,6 +508,7 @@ mostrarTabla(){
 
   let tabla = document.getElementById('listadoPagosCuotasEntrenadores')
   if(tabla)  tabla.style.display = "block"; 
+  this.generarPdf=true;
 },1000);
 }
 
@@ -460,6 +518,19 @@ eliminarEntrenadorCuota(entrenadorCuota:PagoCuotaEntrenador){
   let medio:any = entrenadorCuota.medioPago;
   let importe:any = entrenadorCuota.importe;
 
+  this.idTransaccionPorIdPagoCuotaEntrenador(documentoJugador, id_cuota);
+
+  setTimeout(() => {
+    
+this.tService.eliminarTransaccion(this.idTransaccion).subscribe(res=>{
+                
+});
+
+  }, 500);
+
+  setTimeout(() => {
+    
+  
   this.pceService.eliminarPagoCuotaEntrenador(id_cuota, documentoJugador).subscribe(res =>{
     Swal.fire({
       position: 'center',
@@ -482,6 +553,7 @@ eliminarEntrenadorCuota(entrenadorCuota:PagoCuotaEntrenador){
    }
 
     });
+  }, 500);
     }
 
 
@@ -515,4 +587,144 @@ eliminarEntrenadorCuota(entrenadorCuota:PagoCuotaEntrenador){
       this.display = !this.display;
     }
 
+    imprimir(){
+
+      const encabezado = ["Documento", "Nombre", "Año", "Mes", "Importe", "Medio", "Fecha de pago"];
+    
+      let entrenadorCuotaFiltrado: Array<PagoCuotaEntrenador>;
+      entrenadorCuotaFiltrado = new Array<PagoCuotaEntrenador>();
+     
+      entrenadorCuotaFiltrado= this.filtroEntrenadorCuota(this.entrenadoresCuotas, this.searchName, this.searchApellido, this.searchDocumento, this.searchAnio, this.searchMes, this.searchMedioPago);
+    
+     const cuerpo =  entrenadorCuotaFiltrado.map(
+    
+      (obj : PagoCuotaEntrenador) => {
+        const datos = [
+          obj.documento,
+          obj.nombre + " " + obj.apellido,
+          obj.anioCuota,
+          obj.mesCuota,
+          obj.importe,
+          obj.medioPago,
+          obj.fechaPago
+        ]
+        return datos;
+      }
+     )
+    
+    this.rService.imprimir(encabezado, cuerpo, "Listado de pago de cuotas de entrenadores", true);
+    
+    }
+    
+    filtroEntrenadorCuota(values: PagoCuotaEntrenador[], searchName: string, searchApellido:string,searchDocumento: string, searchAnio:string, searchMes:string, searchMedioPago:string): any[] {
+
+      let filterValues=values;
+
+
+      if(values.length>0){
+      
+        if(searchName!=""){ 
+          console.log(searchName);
+        values.forEach(value =>
+          {
+        let nombre:any=value.nombre;
+        value.nombre= nombre.toLowerCase();
+      
+    }
+        );
+        searchName=searchName.toLowerCase();
+        filterValues= filterValues.filter(value => value.nombre?.includes(searchName));
+      }
+        
+        if(searchApellido!=""){
+          console.log(searchApellido);
+          values.forEach(value =>
+            {
+          let apellido:any=value.apellido;
+          value.apellido= apellido.toLowerCase();
+      }
+          );
+        searchApellido=searchApellido.toLowerCase();
+        filterValues=filterValues.filter(value => value.apellido?.includes(searchApellido));
+        
+        }
+     
+      if(searchDocumento!=""){ 
+       
+        console.log(searchDocumento);
+        filterValues= filterValues.filter(value => value.documento?.toString().includes(searchDocumento));
+      }
+    
+      if(searchAnio!=""){
+        console.log(searchAnio);
+        values.forEach(value =>
+          {
+        let anio:any=value.anioCuota;
+        value.anioCuota= anio.toLowerCase();
+    }
+        );
+      searchAnio=searchAnio.toLowerCase();
+      filterValues=filterValues.filter(value => value.anioCuota?.includes(searchAnio));
+      
+      }
+    
+      if(searchMes!=""){
+        console.log(searchMes);
+        values.forEach(value =>
+          {
+        let mes:any=value.mesCuota;
+        value.mesCuota= mes.toLowerCase();
+    }
+        );
+      searchMes=searchMes.toLowerCase();
+      filterValues=filterValues.filter(value => value.mesCuota?.includes(searchMes));
+      
+      }
+    
+      if(searchMedioPago!=""){
+        console.log("xxx");
+        console.log(searchMedioPago);
+        values.forEach(value =>
+          {
+        let medioPago:any=value.medioPago;
+        value.medioPago= medioPago.toLowerCase();
+    }
+        );
+      searchMedioPago=searchMedioPago.toLowerCase();
+      filterValues=filterValues.filter(value => value.medioPago?.includes(searchMedioPago));
+      
+      }
+    
+      }
+    
+      filterValues.forEach(element => {
+        element.nombre = this.mayusculaPrimerLetra(element.nombre);
+        element.apellido = this.mayusculaPrimerLetra(element.apellido);
+        element.medioPago = this.mayusculaPrimerLetra(element.medioPago);
+     });
+    
+      return filterValues;
+      }
+    
+      mayusculaPrimerLetra(string:String) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+
+      volver(){
+
+        if(this.router.url=="/homeAdministrador/pagoCuotaEntrenador/nuevo"){ 
+          this.router.navigate(['/homeAdministrador']);
+          }
+          else{
+            this.router.navigate(['/homeInvitado']);
+          }
+      }
+
+      idTransaccionPorIdPagoCuotaEntrenador(documento:number, idCuota:number){
+
+        this.tService.mostrarTransaccionesPorEntrenadorYCuota(documento, idCuota).subscribe(res=>{
+                    
+         this.idTransaccion=res[0].id;
+        });
+      }
 }

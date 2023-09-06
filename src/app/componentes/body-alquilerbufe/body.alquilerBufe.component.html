@@ -8,7 +8,7 @@
         </span>
         <select formControlName="numeroBufe" [(ngModel)]="numeroBufe">
             <option value="default" disabled selected="numeroBufe">Seleccione un bufé..</option>
-            <option [value]="bufe.numero" *ngFor="let bufe of bufes"> {{bufe.numero}}</option>
+            <option [value]="bufe.numeroBufe" *ngFor="let bufe of bufes"> {{bufe.numeroBufe}}</option>
         </select>
     </div>
     <div class="p-inputgroup p-m-2">
@@ -64,9 +64,12 @@
     </span>
     <input type="text" class="form-select form-control-lg" name="filterMedioPago" (keyup)="onSearchAlquilerBufeMedioPago(filterPropertyMedioPago)" [(ngModel)]="filterPropertyMedioPago" placeholder="Buscar medio de pago..." />
 </div>
+<div *ngIf="generarPdf == true">
+    &nbsp; &nbsp;&nbsp; <p-button  styleClass="" label="Generar PDF" (click)="imprimir()" styleClass="p-button-raised"></p-button>
+    </div>
      </div>
 </div>
- 
+<p-button  styleClass="" id="btn_volver" label="Volver" (click)="volver()" styleClass="p-button-raised"></p-button>
 <br>
 <div id="listadoAlquileresBufe" style="display:none;">
     
@@ -84,7 +87,7 @@
     <tbody>
 
         <tr *ngFor="let alquilerBufe of alquileresBufe | filtroAlquilerBufe:searchFecha:searchNumeroBufe:searchMedioPago">
-            <td>{{ alquilerBufe.bufe.numero }}</td>
+            <td>{{ alquilerBufe.bufe.numeroBufe }}</td>
             <td>{{ alquilerBufe.fecha }}</td>
             <td>{{ alquilerBufe.importe }}</td>
             <td>{{ alquilerBufe.medioPago  }}</td>
@@ -105,7 +108,7 @@
             </span>
             <select formControlName="numeroBufeModificar" [(ngModel)]="numeroBufeModificar">
                 <option value="" disabled>Seleccione un bufe..</option>
-                <option [value]="bufe.numero" *ngFor="let bufe of bufes"  selected="numeroBufeModificar"> {{bufe.numero}}</option>
+                <option [value]="bufe.numeroBufe" *ngFor="let bufe of bufes"  selected="numeroBufeModificar"> {{bufe.numeroBufe}}</option>
             </select>
         </div>
         <div class="p-inputgroup p-m-2">

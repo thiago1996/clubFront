@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, NonNullableFormBuilder, FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 import { onErrorResumeNextWith } from 'rxjs';
 import { Cuenta } from 'src/app/modelo/Cuenta';
 import { CuentaServicio } from 'src/app/servicio/cuenta.servicio';
@@ -17,7 +18,7 @@ export class BodyCuentaComponent {
   cuentas: Array<Cuenta>;
   display:boolean;
 
-  constructor(private fb:FormBuilder, private cService: CuentaServicio){
+  constructor(private fb:FormBuilder, private cService: CuentaServicio, private router:Router){
   
 this.mostrarTabla();
 
@@ -186,4 +187,8 @@ mostrarCuentas(){
     this.display = !this.display;
   }
 
+  volver(){
+
+    this.router.navigate(['/homeAdministrador']);
+  }
 } 

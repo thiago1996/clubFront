@@ -1,0 +1,100 @@
+<br><h2> &nbsp; &nbsp; Registro de Usuario</h2>
+<br>
+<div class="container-formulario">
+<div>
+<form action="" [formGroup]="formularioUsuario">
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-user"></i>
+        </span>
+        <input pInputText placeholder="Usuario" formControlName="nombre" />
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-lock"></i>
+        </span>
+        <input type="password" pInputText placeholder="Contraseña" formControlName="contrasenia" />
+    </div>
+    <div class="p-inputgroup p-m-2">
+        <span class="p-inputgroup-addon">
+            <i class="pi pi-list"></i>
+        </span>
+        <select formControlName="tipoUsuario" [(ngModel)]="tipoUsuario">
+            <option value="default" disabled selected="tipoUsuario">Seleccione un tipo</option>
+            <option value="Administrador"> Administrador </option>
+            <option value="Invitado"> Invitado </option>
+        </select>
+    </div>
+<br>
+    <p-button styleClass="crear" label="Crear" (click)="crearUsuario()" styleClass="p-button-raised"></p-button>
+    <p-button styleClass="datos" label="Datos" (click)="mostrarTabla()" styleClass="p-button-raised"></p-button>
+</form>
+</div>
+
+ </div>
+ <p-button  styleClass="" id="btn_volver" label="Volver" (click)="volver()" styleClass="p-button-raised"></p-button>
+<br>
+<br>
+<div id="listadoUsuarios" style="display:none;">
+    <table class="table-listado">
+        <thead>
+            <tr>
+
+                <th>Usuario</th>
+                <th>Contraseña</th>
+                <th>Tipo de usuario</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let usuario of usuarios">
+                <td>{{usuario.nombre}}</td>
+                <td>{{usuario.contrasenia}}</td>
+                <td>{{usuario.tipoUsuario}}</td>
+
+                <td><p-button icon="pi pi-pencil" styleClass="p-button-rounded"
+                        (click)="activador(usuario)"></p-button></td>
+                <td><p-button icon="pi pi-times" styleClass="p-button-rounded"
+                        (click)="eliminarUsuario(usuario)"></p-button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<p-dialog header="Modificar Usuario" [(visible)]="display" [closable]="false">
+
+    <form action="" [formGroup]="formularioModificarUsuario">
+
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-user"></i>
+            </span>
+            <input pInputText placeholder="Usuario" formControlName="nombre" />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-lock"></i>
+            </span>
+            <input type="password" pInputText placeholder="Contraseña" formControlName="contrasenia" />
+        </div>
+        <div class="p-inputgroup p-m-2">
+            <span class="p-inputgroup-addon">
+                <i class="pi pi-list"></i>
+            </span>
+        <select formControlName="tipoUsuario" [(ngModel)]="tipoUsuarioModificar">
+            <option value="default" disabled selected="tipoUsuario">Seleccione un tipo</option>
+            <option value="Administrador"> Administrador </option>
+            <option value="Invitado"> Invitado </option>
+        </select>
+    </div>
+    <br>
+
+            <p-button label="Modificar" id="modificar" (click)="modificarUsuario()" styleClass="p-button-raised"></p-button>
+            <p-button label="Cancelar" id="cancelar" (click)="cerrar()" styleClass="p-button-raised"></p-button>
+          
+
+    </form>
+
+</p-dialog>

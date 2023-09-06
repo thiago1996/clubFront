@@ -37,6 +37,9 @@ buscarSocioPorDocumento(documento:number){
   return this.http.get<Boolean>(this.rutaglobal + 'buscarPorDocumento/'+documento);
 }
 
+obtenerSocioPorDocumento(documento:number){
+  return this.http.get<Socio>(this.rutaglobal + 'obtenerPorDocumento/'+documento);
+}
    //Eliminar persona
    eliminarSocio(documento: number){
 

@@ -9,6 +9,6 @@ export class AlquilerCancha{
     fecha!:String;
     horaInicio!:String;
     horaFin!:String;
-    medioPago?:String;
+    medioPago!:String;
     observaciones?:String;
 }

@@ -1,5 +1,6 @@
 import { COMPILER_OPTIONS, Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, NonNullableFormBuilder, FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Cancha } from 'src/app/modelo/Cancha';
 import { CanchaServicio } from 'src/app/servicio/cancha.servicio';
 import Swal from 'sweetalert2';
@@ -21,7 +22,7 @@ export class BodyCanchaComponent {
   numeroAModificar:any;
   
 
-  constructor(private fb:FormBuilder, private cService: CanchaServicio){
+  constructor(private fb:FormBuilder, private cService: CanchaServicio, private router:Router){
   
     this.formularioCancha = fb.group({
 
@@ -247,6 +248,16 @@ this.buscarIdCancha(this.numeroAModificar);
 
 cerrar(){
   this.display = !this.display;
+}
+
+volver(){
+
+  if(this.router.url=="/homeAdministrador/cancha/nuevo"){ 
+    this.router.navigate(['/homeAdministrador']);
+    }
+    else{
+      this.router.navigate(['/homeInvitado']);
+    }
 }
 
 }

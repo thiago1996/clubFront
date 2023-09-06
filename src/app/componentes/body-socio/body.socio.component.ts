@@ -1,6 +1,7 @@
 import { style } from '@angular/animations';
 import { Component, ɵsetAllowDuplicateNgModuleIdsForTest } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, NonNullableFormBuilder, FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Socio } from 'src/app/modelo/Socio';
 import { ReporteServicio } from 'src/app/servicio/reporte.servicio';
 import { SocioServicio } from 'src/app/servicio/socio.service';
@@ -27,7 +28,7 @@ export class BodySocioComponent {
   documentoAModificar:any;
   generarPdf:boolean=false;
 
-constructor(private fb:FormBuilder, private sService: SocioServicio, private rService:ReporteServicio){
+constructor(private fb:FormBuilder, private sService: SocioServicio, private rService:ReporteServicio, private router:Router){
 
   this.socios = new Array<Socio>();
   this.display=false;
@@ -267,6 +268,15 @@ let filterValues = values;
   mayusculaPrimerLetra(string:String) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
+
+volver(){
+  if(this.router.url=="/homeAdministrador/socio/nuevo"){ 
+  this.router.navigate(['/homeAdministrador']);
+  }
+  else{
+    this.router.navigate(['/homeInvitado']);
+  }
+}
 
 }
 
